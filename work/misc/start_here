@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Get the absolute path for this script
+RC_DIR=$( (cd $(dirname $0)/../rc && pwd) )
+
+for i in $(find $RC_DIR -name .svn -prune -o -name '.*' -type f -print); do
+    NAME=$(basename $i)
+
+    if [ -e "$HOME/$NAME" ]; then
+        if [ "$1" == "-b" ]; then
+            # Rename the existing file
+            mv $HOME/$NAME{,.old}
+        else
+            # Skip creating links if file aleady exists
+            echo "Skipped: $NAME"
+            continue
+        fi
+    fi
+
+    echo "Creating symbolic link to $NAME"
+    ln -s $i "$HOME/$NAME"
+done
+
+[ ! -d "$HOME/tmp" ] && mkdir "$HOME/tmp"
+[ ! -d "$HOME/bin" ] && mkdir "$HOME/bin"
+
+echo
+BIN_DIR=$( (cd $(dirname $0)/../scripts && pwd) )
+for i in $(find "$BIN_DIR" -name .svn -prune -o -type f -print); do
+    NAME=$(basename $i)
+
+    if [ ! -e "$HOME/bin/$NAME" ]; then
+        echo "Creating symbolic link to $NAME"
+        ln -s "$i" "$HOME/bin/$NAME"
+    else
+        # Skip creating links if file aleady exists
+        echo "Skipped: $NAME"
+    fi
+done
+
+# A softlink for gvimproj to vimproj
+echo "Creating symbolic link: gvimproj"
+ln -s "$BIN_DIR/vimproj" "$HOME/bin/gvimproj"
+
+# Create a vim project directory
+[ ! -d ~/vimproj ] && mkdir ~/vimproj

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+DISPLAY=
+USAGE="Usage: $(basename $0) filename rev1 rev2 [svn-options]"
+
+if [ "$#" -lt 3 ]; then
+    echo "$USAGE"
+    exit 1
+fi
+
+FILE="$1"
+REV1="$2"
+REV2="$3"
+
+shift 3
+
+if [ ! -f "$FILE" ]; then
+    echo "$(basename $0): file doesn't exist: $FILE"
+    exit 1
+fi
+
+svn cat -r $REV1 $FILE "$@" > "$HOME/tmp/$FILE.$REV1" || { echo "Failed to get revision $REV1"; exit 1; }
+svn cat -r $REV2 $FILE "$@" > "$HOME/tmp/$FILE.$REV2" || { echo "Failed to get revision $REV2"; exit 1; }
+
+vimdiff "$HOME/tmp/$FILE.$REV1" "$HOME/tmp/$FILE.$REV2"

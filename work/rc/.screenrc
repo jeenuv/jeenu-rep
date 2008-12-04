@@ -1,0 +1,25 @@
+
+# Setup the status line
+#                          till CW   Current Win   Rest
+#                          <-------><-------------><->
+hardstatus alwayslastline "%{.bW}%-w%{.mW}%n %t%{-}%+w %=%{..G} %d-%M-%Y [%H] %C %A %{..Y}"
+# hardstatus alwayslastline '%{= kG}[ %{G}%H %{g}][%= %{=kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B}%Y-%m-%d %{W}%c %{g}]'
+
+# Hide the status message
+startup_message off
+
+msgwait 3
+
+# Use ^J isntead of ^A
+escape ^Jj
+
+# Don't use the vbell; it's irritating
+vbell off
+
+# Create new shells as login shells so that .bask_logout is executed on exit
+# This is facilitated so that bookmarks that are set/reset are reflected upon
+# each shell exit. Same is the case with history
+shell bash
+
+# define the number of lines to scroll back
+defscrollback 4000

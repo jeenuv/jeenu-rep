@@ -1,0 +1,132 @@
+#!/bin/bash
+
+# Avoid file name globbing
+set -f
+
+TEST=1
+ARGSLEFT=
+CURDIR=$PWD
+FINDPAT='-name .svn -prune -o -type d -printf %h/%f\040\052\n'
+PATSRCH=0
+DISPLAYCMD='less'
+
+USAGE="$(basename $0) [--extension=EXTNS] [--all] [--stdout] [--depth=DEPTH] [DIRNAME [DIRNAME]]
+	--extension: display files that end with EXTNS where EXTNS is like EXTN1,EXTN2
+	--all: display all files
+	--stdout: print display to stdout
+	--depth: go until this depth
+if DIRNAME is not specified, \".\" is assumed"
+
+until [[ -z $* ]]
+do
+    # Decide whether to test, and if at all we have to, then check first 1 or 2 characters
+    if [[ ${1:0:1} = "-" || ${1:0:2} = "--" ]]
+    then
+        case $1 in
+            # Option
+            --help)
+            echo -e "$USAGE"
+            exit;;
+
+            # Option
+            --all)
+            FINDPAT="$FINDPAT -o -type f -print";;
+
+            # Option
+            --stdout)
+            DISPLAYCMD="tee";;
+
+            # Option
+            --depth=*)
+            ARG=${1#--depth=}
+
+            if [[ -z "$ARG" ]]
+            then
+                echo "argument required for --depth"
+                exit
+            else
+                DEPTH=${ARG#=}
+
+                if [[ ! -z "$DEPTH" ]]
+                then
+                    FINDPAT="-maxdepth $DEPTH $FINDPAT"
+                fi
+            fi;;
+
+            # Option
+            --extension=*)
+            ARG=${1#--extension=}
+
+            if [[ -z "$ARG" ]]
+            then
+                echo "argument required for --extension"
+                exit
+            else
+                EXTENSIONS=${ARG#=}
+                EXTLIST=
+
+                # Examine all the extensions
+                until [[ -z $EXTENSIONS ]]
+                do
+                    EXT=${EXTENSIONS%%,*}
+                    EXTLIST="$EXTLIST -name *$EXT -o"
+
+                    EXTENSIONS=${EXTENSIONS#$EXT}
+                    EXTENSIONS=${EXTENSIONS#,}
+                done
+
+                # Remove the trailing " -o"
+                EXTLIST=${EXTLIST%-o}
+                FINDPAT="$FINDPAT -o ("$EXTLIST") -print"
+            fi;;
+
+            # Option
+            --)
+            # No need to test for arguments from now on. I'm POSIX!
+            ARGSLEFT="$ARGSLEFT $@"
+            break;;
+
+            # Default
+            *)
+            echo "Invalid option: ${1%=*}"
+            echo -e "$USAGE"
+            exit;;
+        esac
+    else
+        ARGSLEFT="$ARGSLEFT $1"
+    fi
+
+    shift
+done
+
+# echo "Args left: $ARGSLEFT"
+# echo "Find pattern: $FINDPAT"
+
+# Re-assign what's left to positional parameters
+set -- $ARGSLEFT
+# echo "Parameters after setting: $@"
+
+if [[ $# -eq 0 ]]
+then
+    DIRS=$CURDIR
+else
+    DIRS=$*
+fi
+
+for i in $DIRS
+do
+    echo -e "\n-- $i:\n"
+    # 1. Delele line containing only "." and ".svn" (.svn is still there in the o/p in the form of directories)
+    # 2. Delte the potential "./" in front of each line
+    # 3. Substitue each directory name with four ' '
+    # 4. At the end of ' ' sequence, append `- to make it look like directory tree
+    if [[ -d "$i" ]]
+    then
+        cd "$i" && find . $FINDPAT | sed "/\.svn/d;s_^\./__;s_[^/]\+/_    _g;s_^\( \+\)_&\`- _"
+    else
+        echo "**$(basename $0): no such directory: $i**"
+    fi
+
+    echo
+    cd "$CURDIR"
+done | $DISPLAYCMD

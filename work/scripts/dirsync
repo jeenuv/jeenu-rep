@@ -1,0 +1,358 @@
+#!/bin/bash
+
+PROGNAME=$(basename $0)
+
+USAGE="$PROGNAME usage: $PROGNAME OPERATION [OPTIONS] LEFT RIGHT 
+OPERATION can be one of
+	--sync-to-right : copy new/modfied items from left to right
+	--sync-to-left  : copy new/modfied items from right to left
+	--mirror-right  : make the left a mirror copy of right
+	--mirror-left   : make the right a mirror copy of left
+
+OPTIONS can be
+	--svn           : use SVN commands for file operations
+	--run           : execute instead of dry-run
+	--help          : display this help"
+
+RM_DIR_COMMAND='rm -rf'
+RM_FILE_COMMAND='rm'
+NEW_DIR_COMMAND='mkdir'
+NEW_FILE_COMMAND='cp'
+REPLACE_COMMAND='cp'
+
+DRYRUN=1
+OP_PENDING=1
+ARGSLEFT=
+
+# We need 'find' in path
+which find >/dev/null
+if [[ $? -ne 0 ]]
+then
+    echo "$PROGNAME: couldn't find the 'find' utility"
+    exit 1
+fi
+
+# functions
+function check_op()
+{
+    if [[ $OP_PENDING -eq 0 ]]
+    then
+        echo "$PROGNAME: more than one operation"
+        exit 1
+    fi
+
+    OP_PENDING=0
+
+    return 0
+}
+
+function run_cmd()
+{
+    local ERROR
+
+    # output the command for info
+    echo "-$1"
+
+    # capture the command output so that it can be logged incase of failure
+    ERROR=$(eval $1 2>&1)
+    if [[ $? -ne 0 ]]
+    then
+        # log both command it's error message
+        (
+        echo "$1"
+        echo "$ERROR"
+        echo
+        ) >> $PROGNAME.FAIL
+    fi
+}
+
+function end()
+{
+    echo
+    if [[ -e $PROGNAME.FAIL ]]
+    then
+        echo "$PROGNAME: WARNING: failures detected"
+    fi
+    echo "$PROGNAME: see $(eval echo $PROGNAME.{NEW,DELETED,FAIL}) for results"
+
+    exit 0
+}
+
+# Comand line parsing
+until [[ -z $* ]]
+do
+    # Decide whether to test, and if at all we have to, then check first 1 or 2 characters
+    if [[ ${1:0:1} = "-" || ${1:0:2} = "--" ]]
+    then
+        case $1 in
+            # Option
+            --help)
+            echo "$USAGE"
+            exit 0
+            ;;
+
+            # Option
+            --sync-to-left)
+            TO_LEFT=1
+            check_op
+            ;;
+
+            # Option
+            --sync-to-right)
+            TO_LEFT=0
+            check_op
+            ;;
+
+            # Option
+            --mirror-left)
+            TO_LEFT=0
+            MIRROR=1
+            check_op
+            ;;
+
+            # Option
+            --mirror-right)
+            TO_LEFT=1
+            MIRROR=1
+            check_op
+            ;;
+
+            # Option
+            --svn)
+            DO_SVN=1
+            RM_DIR_COMMAND='svn delete'
+            RM_FILE_COMMAND='svn delete'
+            NEW_DIR_COMMAND='svn mkdir'
+            NEW_FILE_COMMAND='svn add'
+            ;;
+
+            --run)
+            DRYRUN=0
+            ;;
+
+            # Option
+            --)
+            # No need to test for arguments from now on. I'm POSIX!
+            ARGSLEFT="$ARGSLEFT $@"
+            break
+            ;;
+
+            # Default
+            *)
+            echo "$PROGNAME: invalid option: ${1%=*}"
+            echo "$USAGE"
+            exit 1
+            ;;
+        esac
+    else
+        ARGSLEFT="$ARGSLEFT $1"
+    fi
+
+    shift
+done
+
+if [[ $OP_PENDING -eq 1 ]]
+then
+    echo "$PROGNAME: no operation specified"
+    echo "$USAGE"
+    exit 1
+fi
+
+# echo "Args left: $ARGSLEFT"
+
+# Re-assign what's left to positional parameters
+set -- $ARGSLEFT
+
+# Do we have more than we need?
+if [[ $# -gt 2 ]]
+then
+    echo "$PROGNAME: too many arguments"
+    echo "$USAGE"
+    exit 1
+fi
+
+# determine the source and destination
+if [[ $TO_LEFT -eq 1 ]]
+then
+    # from right to left
+    SOURCE=${2%/}
+    DEST=${1%/}
+else
+    # from left to right
+    SOURCE=${1%/}
+    DEST=${2%/}
+fi
+
+# check for existance
+if [[ ! -d $SOURCE ]]
+then
+    echo "$PROGNAME: no such directory: $SOURCE"
+    exit 1
+fi
+
+if [[ ! -d $DEST ]]
+then
+    echo "$PROGNAME: no such directory: $DEST"
+    exit 1
+fi
+
+if [[ $MIRROR -eq 0 ]]
+then
+    echo "$PROGNAME: copying new/modified files and orphans from \"$SOURCE\" to \"$DEST\" .."
+else
+    # if [[ $DO_SVN -eq 0 ]]
+    # then
+    #     # this is just a blind replace
+    #     echo "$PROGNAME: mirroring without SVN is mere replacing. use 'cp -r' command"
+    #     exit 1
+    # else
+    # fi
+    echo "$PROGNAME: mirroring \"$SOURCE\" on to \"$DEST\""
+fi
+
+[[ $DRYRUN -eq 1 ]] && echo "$PROGNAME: doing a dry-run, use --run switch for actions to take effect"
+
+# Delete old file if exists
+[[ -f $PROGNAME.NEW ]] && rm $PROGNAME.NEW
+[[ -f $PROGNAME.REPLACED ]] && rm $PROGNAME.REPLACED
+[[ -f $PROGNAME.DELETED ]] && rm $PROGNAME.DELETED
+[[ -f $PROGNAME.FAIL ]] && rm $PROGNAME.FAIL
+
+if [[ $DEST -nt $SOURCE ]]
+then
+    echo -ne "$PROGNAME: $DEST is newer than $SOURCE.\nEnter 'n' to abort: "
+    read
+    [[ $REPLY = "n" || $REPLY = "N" ]] && exit 0
+else
+    echo -n "$PROGNAME: press any key to continue..."
+    read
+fi
+
+# read each line
+OLDIFS=$IFS
+IFS=$'\xa'
+
+# scan the source dir
+for THISFILE in $(find $SOURCE \( -name .svn -o -name \*.o -o -name \*.obj \) -prune -o -print)
+do
+    IFS=$OLDIFS
+
+    # determine the counter part
+    OTHERFILE=${DEST}${THISFILE#$SOURCE}
+
+    # It's a directory; create the couterpart if doesn't already exist
+    if [[ -d "$THISFILE" ]]
+    then
+        if [[ ! -d "$OTHERFILE" ]]
+        then
+            # echo "created new directory $OTHERFILE"
+            # create the counterpart and add it to SVN
+            if [[ $DRYRUN -eq 0 ]]
+            then
+                run_cmd "$NEW_DIR_COMMAND \"$OTHERFILE\""
+                # echo "-$NEW_DIR_COMMAND $OTHERFILE"
+                # $NEW_DIR_COMMAND "$OTHERFILE"
+            fi
+
+            echo directory: "$THISFILE" >> $PROGNAME.NEW
+        fi
+        continue
+    fi
+
+    # Copy the new file to destination
+    if [[ ! -f "$OTHERFILE" ]]
+    then
+        # echo -e "\t$OTHERFILE doesn't exist"
+        # echo "copying $THISFILE -> $OTHERFILE"
+        if [[ $DRYRUN -eq 0 ]]
+        then
+            # copy the file and add it to svn
+            run_cmd "$REPLACE_COMMAND \"$THISFILE\" \"$OTHERFILE\""
+            # echo "-$REPLACE_COMMAND $THISFILE $OTHERFILE"
+            # $REPLACE_COMMAND "$THISFILE" "$OTHERFILE"
+
+            if [[ $DO_SVN -eq 1 ]]
+            then
+                run_cmd "$NEW_FILE_COMMAND \"$OTHERFILE\""
+                # echo "-$NEW_FILE_COMMAND $OTHERFILE"
+                # $NEW_FILE_COMMAND "$OTHERFILE"
+            fi
+        fi
+
+        echo file: "$THISFILE" >> $PROGNAME.NEW
+        continue
+    fi
+
+    diff --brief "$THISFILE" "$OTHERFILE" >/dev/null
+
+    # If the files differ, replace with the new file
+    if [[ $? -ne 0 ]]
+    then
+        # echo "replacing $THISFILE -> $OTHERFILE"
+        if [[ $DRYRUN -eq 0 ]]
+        then
+            run_cmd "$REPLACE_COMMAND \"$THISFILE\" \"$OTHERFILE\""
+            # echo "-$REPLACE_COMMAND $THISFILE $OTHERFILE"
+            # $REPLACE_COMMAND "$THISFILE" "$OTHERFILE"
+        fi
+
+        echo "$OTHERFILE" >> $PROGNAME.REPLACED
+    fi
+
+    IFS=$'\xa'
+done
+
+# exit if no need of mirror
+[[ $MIRROR -eq 0 ]] && end
+
+# Mirroring needs an additional step of deleting some files from destination.
+# Since we don't know what files in the destination are not present in the
+# source, we have to scan the destination directory to find these
+
+# scan the destination dir
+for THISFILE in $(find $DEST \( -name .svn -o -name \*.o -o -name \*.obj \) -prune -o -print)
+do
+    IFS=$OLDIFS
+
+    # determine the counter part
+    OTHERFILE=${SOURCE}${THISFILE#$DEST}
+
+    # this file might have got deleted when it's parent directory was deleted
+    [[ ! -e "$THISFILE" ]] && continue
+
+    # other file doesn't exist, this has to be deleted then
+    if [[ ! -e "$OTHERFILE" ]]
+    then
+        # if the file is currently under SVN, then we have to delete it from
+        # SVN as well. Only the 'svn ls' seem to return a non-zero error code
+        # on failure.
+
+        [[ $DRYRUN -eq 0 ]] && svn ls "$THISFILE" >/dev/null 2>&1
+        if [[ $? -ne 0 ]]
+        then
+            # this is not a versioned file/dir, so can be deleted if not in SVN mode
+
+            # check if in SVN mode
+            if [[ $DO_SVN -eq 0 ]]
+            then
+                # if it's a file
+                if [[ -f "$THISFILE" ]]
+                then
+                    [[ $DRYRUN -eq 0 ]] && run_cmd "rm \"$THISFILE\""
+                    echo "$THISFILE" >> $PROGNAME.DELETED
+                elif [[ -d "$THISFILE" ]]
+                then
+                    [[ $DRYRUN -eq 0 ]] && run_cmd "rm -rf \"$THISFILE\""
+                    echo "$THISFILE" >> $PROGNAME.DELETED
+                fi
+            fi
+        else
+            # this is a versioned file/dir
+            [[ $DRYRUN -eq 0 ]] && run_cmd "svn delete \"$THISFILE\""
+        fi
+    fi
+
+    IFS=$'\xa'
+done
+
+end

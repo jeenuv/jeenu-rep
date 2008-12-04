@@ -1,0 +1,31 @@
+#!/bin/bash
+
+DISPLAY=
+PROGNAME=$(basename $0)
+if [ "$#" -eq 0 ]; then
+    echo $PROGNAME filename
+    exit
+fi
+
+: ${SVNPATCHFILE:=~/tmp/svnpatchfile}
+
+for i; do
+    # skip directories
+    [ -d "$i" ] && continue
+
+    echo "getting diff..."
+    svn diff $i > $SVNPATCHFILE
+    [ ! $? ] && continue
+
+    if [ "$(stat -c %s $SVNPATCHFILE)" -eq 0 ]; then
+        echo "$PROGNAME: $i: no diff found"
+        exit
+    else
+        vim -n '+set patchexpr=MyPatch()
+                function MyPatch()
+                    call system("patch -R -o " . v:fname_out . " " . v:fname_in . " < " .  v:fname_diff)
+                endfunction' \
+               "+leftabove vertical diffpatch $SVNPATCHFILE|cmap q qa|nmap <F7> ]c|nmap <F6> [c|windo set fdm=diff|normal gg" \
+        $i
+    fi
+done

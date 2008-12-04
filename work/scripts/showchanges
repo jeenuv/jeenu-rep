@@ -1,0 +1,51 @@
+#!/bin/bash
+
+DISPLAY=
+PROGNAME=$(basename $0)
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $PROGNAME filename revision_no"
+    exit
+fi
+
+FILENAME="$1"
+REV="$2"
+
+: ${SVNPATCHFILE:=~/tmp/svnpatchfile}
+
+# skip directories
+if [ ! -e "$FILENAME" ]; then
+    echo "$PROGNAME: no such file: $FILENAME"
+    exit
+fi
+
+if echo "$REV" | grep '[^0-9]\+' >/dev/null 2>&1; then
+    echo "$PROGNAME: not a valid revision: $REV"
+    exit
+fi
+
+# Previous revision
+PREV_REV=$((REV - 1))
+
+if ! svn diff -c "$REV" "$FILENAME" > $SVNPATCHFILE; then
+    echo "$PROGNAME: svn diff failed!"
+    exit
+fi
+
+if [ "$(stat -c %s $SVNPATCHFILE)" -eq 0 ]; then
+    echo "$PROGNAME: $FILENAME: no diff found"
+    exit
+else
+    svn log -r "$REV" -v $FILENAME | less -i
+    NEWFILE=~/tmp/svn_prev.${FILENAME##*.}
+    # Get the file with previous revision
+    if ! svn cat -r "$PREV_REV" "$FILENAME" > "$NEWFILE"; then
+        echo "PROGNAME: couldn't get the file with previous revision"
+        exit
+    fi
+    vim -n '+set patchexpr=MyPatch()
+    function MyPatch()
+        call system("patch -o " . v:fname_out . " " . v:fname_in . " < " . v:fname_diff)
+    endfunction' \
+    "+leftabove vertical diffpatch $SVNPATCHFILE|cmap q qa|nmap <F7> ]c|nmap <F6> [c|windo set fdm=diff|normal gg" \
+    "$NEWFILE"
+fi

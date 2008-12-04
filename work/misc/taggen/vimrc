@@ -1,0 +1,48 @@
+
+" Name of this project
+let s:this_project = "vam226"
+
+" Directory where this file lies
+let s:vimproj_dir = "/home/jeevis01/vimproj"
+let s:this_dir =  s:vimproj_dir . "/" . s:this_project
+
+" Root directory for project files (without trailing /)
+let s:root_dir = "/malisvgt/F7-00-2F-6B/vamana/jsr226/kni"
+
+if exists("s:" . s:this_project)
+    echohl Error | echo "Project settings already loaded" | echohl None
+    finish
+endif
+
+exe "let s:" . s:this_project . " = 1"
+exe "set tags+=" . s:this_dir . "/" . "tags"
+" Include the SVG tags too
+exe "set tags+=" . s:vimproj_dir . "/" . "vamsvg/tags"
+
+exe "set path=" . s:root_dir . "/**"
+
+" Options
+set foldopen-=block
+set nolist
+
+" Set the grep path
+exe "set grepprg=grep\\ -nr\\ $*\\ " . s:root_dir . "\\ \\\\\\|\\ sed\\ \\\"/\\\\.svn/d\\\""
+
+" Modify makeprg to accomodate arguments
+" set makeprg=make\ $*
+
+" Add cscope database connection
+if filereadable(s:this_dir . "/cscope")
+    exe "cscope add " . s:this_dir . "/cscope"
+    exe "cscope add " . s:vimproj_dir . "/" . "vamsvg/cscope"
+    set nocst           " Don't search the cs db, but use ctags, on CTRL-]
+    set csto=0          " If at all a :cstag is performed, use the cs db rather than the tag
+    set csqf=c-,t-,e-   " Use quickfix window for caller and assignment search
+else
+    echo "Couldn't find the cs db!"
+endif
+
+" Truncate witespace that are present in the file
+autocmd BufWritePre *.[ch],*.[ch]xx,*.ic,*.java TruncW
+
+exe "cd " . s:root_dir

@@ -1,0 +1,191 @@
+
+# Indicate that the bookmarks are not changed
+changed_bm=0
+
+# Default bookmark profile
+profile_bm="$HOME/.book"
+
+# Read the bookmarks
+function bmread()
+{
+    if [ "$changed_bm" -ne 0 ]; then
+        # There are new/changed book marks
+        REPLY=
+        echo "bmread: There are new bookmarks. Identical bookmarks will be overwritten when reading."
+        read -p "You want to continue (y/n)? "
+        if [ "$REPLY" = "y" -o "$REPLY" = "Y" ]; then
+            # Sanity check
+            if [ "$(cat "$profile_bm" | sed '1q')" != "#BOOKMARK" ]; then
+                echo "bmread: invalid bookmark profile"
+                return 1
+            else
+                unset ${!bm_*}
+                source "$profile_bm"
+                ts_bm=$(stat -c %Y "$profile_bm")
+            fi
+        else
+            return 1
+        fi
+    else
+        # Sanity check
+        if [ "$(cat "$profile_bm" | sed '1q')" != "#BOOKMARK" ]; then
+            echo "bmread: invalid bookmark profile"
+            return 1
+        else
+            unset ${!bm_*}
+            source "$profile_bm"
+            ts_bm=$(stat -c %Y "$profile_bm")
+        fi
+    fi
+
+    changed_bm=0
+    return 0
+}
+
+function bm()
+{
+    if [ "$#" -eq 0 ]; then
+        echo "Usage: bm [-r] bookmark-name"
+        return 1
+    fi
+
+    local opt="-r"
+
+    if [ "$#" -gt 0 -a "$1" = "$opt" ]; then
+        if [ -z "$2" ]; then
+            echo "bm: argument required: bookmark name"
+            return 1
+        fi
+
+        if [ -z "$(eval echo \${bm_$2})" ]; then
+            echo "bm: bookmark not defined: $2"
+            return
+        else
+            unset bm_$2
+            changed_bm=1
+        fi
+    else
+        if { echo "$1" | grep '^[0-9]' || echo "$1" | grep '[^0-9A-Za-z_]'; } > /dev/null; then
+            echo "bm: invalid bookmark name"
+            return
+        fi
+
+        if [ -n "$(eval echo \${bm_$1})" ]; then
+            # if bookmark is already defined
+            REPLY=
+            read -p "bm: bookmark '$1' already defined. overwrite (y/n)? "
+            if [ "$REPLY" = "y" -o "$REPLY" = "Y" ]; then
+                export bm_$1="$(pwd -P)"
+                changed_bm=1
+            else
+                echo "bm: bookmark discarded"
+            fi
+        else
+            export bm_$1="$(pwd -P)"
+            changed_bm=1
+        fi
+    fi
+}
+
+function go()
+{
+    local dir
+
+    if [ "$#" -lt 1 ]; then
+        echo "go where?"
+        echo
+        bms
+        return
+    fi
+
+    if [ -z "$(eval echo \${bm_$1})" ]; then
+        echo "go: bookmark not defined: $1"
+        return
+    else
+        # What if that directory got deleted after it was bookmarked. If that's the case
+        # we don't want an error from bash
+        dir="$(eval echo \${bm_$1})"
+        if [ -d "$dir" ]; then
+            cd "$dir"
+        else
+            echo "go: bookmark $1 is invalid: $dir"
+        fi
+    fi
+}
+
+function bms()
+{
+    [ "$#" -ne 0 ] && { echo "bms: no arguments accepted"; return; }
+    printf "%-20s %s\n%-20s %s\n" Bookmark Location ========== ==========
+    set | awk -F= '/^bm_/{sub("^bm_", ""); printf "%-20s %s\n", $1, $2}'
+}
+
+function bmwrite()
+{
+    if [ "$(stat -c %Y "$profile_bm")" -gt "$ts_bm" ]; then
+        echo "bmwrite: The bookmark file is more recent than when you read it. It'll be re-read before writing"
+        # Bookmark file has been written by some one else, since the time we read it.
+        # This means that there are new bookmarks defined. So better read them
+        bmread
+    fi
+
+    if [ "$changed_bm" -ne 0 ]; then
+        echo "#BOOKMARK" > "$profile_bm"
+        set | awk '/^bm_/{print "export " $0}' >> "$profile_bm"
+        echo "bmwrite: bookmarks saved"
+        changed_bm=0
+        ts_bm=$(stat -c %Y "$profile_bm")
+    else
+        echo "bmwrite: no bookmark changes"
+    fi
+}
+
+function bmprofile()
+{
+    local old_profile
+    local arg="$1"
+
+    if [ "$#" -eq 0 -o -z "$1" ]; then
+        echo "bmprofile: your current bookmark profile is '$profile_bm'"
+        return
+    fi
+
+    if [ "${arg:0:1}" != "/" ]; then
+        # The file name is a relative path; so get the absolute path
+        arg="$( (cd -P $(dirname "$arg") && pwd) )/$(basename "$arg")"
+    fi
+
+    old_profile="$profile_bm"
+
+    if [ -d "$arg" ]; then
+        echo "bmprofile: '$arg' is a directory"
+        return 1
+    elif [ ! -f "$arg" ]; then
+        echo "#BOOKMARK" > "$arg"
+    fi
+
+    profile_bm="$arg"
+
+    if ! bmread; then
+        profile_bm="$old_profile"
+        echo "bmprofile: old bookmark profile restored"
+    fi
+}
+
+function _bm_complete()
+{
+    local BKMS CUR
+
+    COMPREPLY=()
+    CUR=${COMP_WORDS[$COMP_CWORD]}
+
+    if [ \( "${COMP_WORDS[0]}" = "go" -a "$COMP_CWORD" -eq 1 \) -o \( "${COMP_WORDS[0]}" = "bm" -a "$COMP_CWORD" -eq 2 \) ]; then
+        BKMS=$(set | sed -n 's/^bm_\([^=]*\).*$/\1/p' | sed -n ':a;$!{N;ba};${s/\n/ /g;p}')
+        COMPREPLY=($(compgen -W "$BKMS" $CUR))
+    fi
+}
+
+complete -F _bm_complete go
+complete -F _bm_complete bm
+
+# vim:ft=sh:

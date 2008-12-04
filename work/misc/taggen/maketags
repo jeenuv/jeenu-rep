@@ -1,0 +1,47 @@
+#!/bin/bash
+
+PROGNAME=$(basename $0)
+THISDIR=$(dirname $0)
+FILETYPES="*.c *.ic *.cpp *.h *.s"
+SRCDIRS="/home/jeenu/minix"
+
+TEMPFILE=${THISDIR}/files.list
+
+[ -z "$TEMPFILE" ] && exit
+
+## TAGS setup
+
+TAGFILENAME="${THISDIR}/tags"
+
+# Disable file name globbing
+set -f
+
+if [ ! -f "$TEMPFILE" ]; then
+    echo "$PROGNAME: creating list of files..."
+    for i in $FILETYPES; do
+        find $SRCDIRS -name $i >> $TEMPFILE
+    done
+else
+    echo "$PROGNAME: using the existing \"$TEMPFILE\" (addition/deletion of files are not reflected)"
+fi
+
+# Delete the tag file if already existing
+[ -f "$TAGFILENAME" ] && rm $TAGFILENAME
+
+# Build the C tags
+if ctags -f ${TAGFILENAME} --sort=no --c-types=+p -I _PROTOTYPE+ -L $TEMPFILE; then
+    echo $PROGNAME: tags built
+else
+    echo $PROGNAME: error building tags
+fi
+
+## CSCOPE setup
+rm -f cscope*
+
+CSCOPEFILENAME="${THISDIR}/cscope"
+
+if cscope -bqk -i $TEMPFILE -f $CSCOPEFILENAME; then
+    echo $PROGNAME: cscope db built
+else
+    echo $PROGNAME: error building cs db
+fi

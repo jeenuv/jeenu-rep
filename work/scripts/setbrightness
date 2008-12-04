@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# if [ "$(whoami)" != root ]; then
+#     exec sudo su - -c "$0 $*"
+# fi
+
+FILE=/proc/acpi/video/VID/LCD/brightness
+
+if [ -n "$1" ]; then
+    echo "$1" > $FILE
+    exit
+fi
+
+cat $FILE
+read -p "Enter brightness level to set: " REPLY
+echo -n "$REPLY" > $FILE

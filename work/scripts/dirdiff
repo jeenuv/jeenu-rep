@@ -1,0 +1,43 @@
+#!/bin/bash
+
+DISPLAY=
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $(basename $0) dir1 dir2"
+    exit
+fi
+
+exec 3<&0
+
+DIR1=${1%/}
+DIR2=${2%/}
+
+if [ ! -d "$DIR1" ]; then
+    echo "No such directory: $DIR1"
+    exit
+fi
+
+if [ ! -d "$DIR2" ]; then
+    echo "No such directory: $DIR2"
+    exit
+fi
+
+find $DIR1 -name .svn -prune -o -type f -print |
+while read i; do
+    OTHERPATH="${i/$DIR1/$DIR2}"
+
+    if ! diff "$i" "$OTHERPATH" >/dev/null 2>&1; then
+        REPLY=
+        read -n1 -p "$i and $OTHERPATH: continue (n/q)? " 0<&3
+        if [ "$REPLY" = "n" -o "$REPLY" = "N" ]; then
+            echo
+            continue
+        elif [ "$REPLY" = "q" -o "$REPLY" = "Q" ]; then
+            echo
+            break
+        fi
+
+        vimdiff "$i" "$OTHERPATH" 0<&3
+    fi
+done
+
+exec 3<&-

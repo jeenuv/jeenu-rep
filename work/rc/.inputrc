@@ -1,0 +1,10 @@
+# ignore case on completion
+set completion-ignore-case on
+
+# mark modified history lines with *
+# set mark-modified-lines on
+
+# show file types on ambiguity list
+set visible-stats on
+
+"\C-g": forward-search-history
