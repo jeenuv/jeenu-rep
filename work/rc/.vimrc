@@ -233,8 +233,8 @@ if has("autocmd")
         " Auto commands for makefiles
         autocmd BufNew,BufEnter *.gmk,*.make setf make
 
-        " Auto commands for C files to set tw to 80
-        autocmd BufNew,BufEnter *.[ch],*.[ch][xp][xp] set textwidth=80
+        " Auto commands for C files to set tw to 100
+        autocmd BufNew,BufEnter *.[ch],*.[ch][xp][xp] set textwidth=100
 
         " Auto command helpers for switching to alternate tabs
         if v:version >= 700
@@ -262,7 +262,11 @@ command! -nargs=? SetNavChoice call GetNPNavigatonChoiceFromUser("<args>")
 " window obtained after presseing C-x C-e in bash
 command! -nargs=0 PrepareSVNCommit call PrepareSVNCommit()
 
+" For aligning lines left or right w.r.t to a vertical selectin
 command! -range -nargs=1 Align call AlignVert("<args>")
+
+" Insert a (possibly) unique timestamp
+command -nargs=0 -count=1 Timestamp call InsertTimestamp("<count>")
 
 " ****************************************************
 " ****************** FUNCTIONS ***********************
@@ -306,7 +310,7 @@ endfunction
 
 " Obtain what the user want to do when C-N and C-P are pressed
 function! GetNPNavigatonChoiceFromUser(...)
-    if a:0 == 0
+    if a:0 == 0 || a:1 == ""
         let l:choice = input("Enter a choice (p/t/c/l/d/a/g): ")
     else
         let l:choice = a:1
@@ -583,6 +587,27 @@ function! AlignVert(direction) range
         call setpos("'b", l:save_b)
         call setpos("'c", l:save_c)
     endif
+endfu
+
+" Function to insert a (possibly) unique time stamp. This can be used to refer to other locations in
+" the code obviating the need for line-no. and similar references
+function! InsertTimestamp(count) range
+    let l:count = a:count
+
+    if !executable("uuidgen") || !executable("awk")
+        echo "Couldn't find necessary executables"
+        return
+    endif
+
+    while l:count > 0
+        " This will insert the timestamp onto a new line; hence we've to join lines
+        execute "r !uuidgen | awk -F- '{printf $NF}'"
+
+        let l:count = l:count -1
+    endwhile
+
+    " We just inserted the last timestamp; now move to where we were
+    execute "normal " . a:count . "kJ"
 endfu
 
 " ****************************************************
