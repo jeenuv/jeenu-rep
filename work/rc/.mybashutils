@@ -19,9 +19,9 @@ function bmread()
                 echo "bmread: invalid bookmark profile"
                 return 1
             else
-                unset ${!bm_*}
                 source "$profile_bm"
                 ts_bm=$(stat -c %Y "$profile_bm")
+                return 0
             fi
         else
             return 1
@@ -123,10 +123,13 @@ function bms()
 function bmwrite()
 {
     if [ "$(stat -c %Y "$profile_bm")" -gt "$ts_bm" ]; then
-        echo "bmwrite: The bookmark file is more recent than when you read it. It'll be re-read before writing"
         # Bookmark file has been written by some one else, since the time we read it.
         # This means that there are new bookmarks defined. So better read them
+        echo "bmwrite: The bookmark file is more recent than when you read it. It'll be re-read before writing"
         bmread
+        if [ $? -ne 0 ]; then
+            return
+        fi
     fi
 
     if [ "$changed_bm" -ne 0 ]; then
