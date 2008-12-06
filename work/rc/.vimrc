@@ -593,6 +593,7 @@ endfu
 " the code obviating the need for line-no. and similar references
 function! InsertTimestamp(count) range
     let l:count = a:count
+    let l:cursor_pos = getpos(".")
 
     if !executable("uuidgen") || !executable("awk")
         echo "Couldn't find necessary executables"
@@ -606,8 +607,15 @@ function! InsertTimestamp(count) range
         let l:count = l:count -1
     endwhile
 
-    " We just inserted the last timestamp; now move to where we were
-    execute "normal " . a:count . "kJ"
+    if a:count == 1
+        " Only one to insert; and let it remain inline ;)
+        normal diw"_dd
+        call setpos(".", l:cursor_pos)
+        normal P
+    else
+        " We just inserted the last timestamp; now move to where we were
+        call setpos(".", l:cursor_pos)
+    endif
 endfu
 
 " ****************************************************
