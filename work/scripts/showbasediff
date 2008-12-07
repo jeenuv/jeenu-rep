@@ -21,10 +21,7 @@ for i; do
         echo "$PROGNAME: $i: no diff found"
         exit
     else
-        vim -n '+set patchexpr=MyPatch()
-                function MyPatch()
-                    call system("patch -R -o " . v:fname_out . " " . v:fname_in . " < " .  v:fname_diff)
-                endfunction' \
+        vim -n '+set patchexpr=MyPatch()' \
                "+leftabove vertical diffpatch $SVNPATCHFILE|cmap q qa|nmap <F7> ]c|nmap <F6> [c|windo set fdm=diff|normal gg" \
         $i
     fi

@@ -253,7 +253,10 @@ command! TruncW :%s/\s\+$//ce |
 
 " For doing a diff on the BASE version from within Vim
 command! SVNBaseDiff   execute "!svn diff % > ~/tmp/svnpatchfile"|
-                     \ vert diffp ~/tmp/svnpatchfile|windo set fdm=diff
+                     \ set patchexpr=MyPatch()|
+                     \ vert diffp ~/tmp/svnpatchfile|
+                     \ windo set fdm=diff|
+                     \ set patchexpr&
 
 " Command for entering navigation choice
 command! -nargs=? SetNavChoice call GetNPNavigatonChoiceFromUser("<args>")
@@ -617,6 +620,12 @@ function! InsertTimestamp(count) range
         call setpos(".", l:cursor_pos)
     endif
 endfu
+
+" To generage patch for SVN. This is used in SVNBaseDiff command as well as
+" showbasediff shell script
+function MyPatch()
+    call system("patch -R -o " . v:fname_out . " " . v:fname_in . " < " .  v:fname_diff)
+endfunction
 
 " ****************************************************
 " ***************** END FUNCTIONS ********************
