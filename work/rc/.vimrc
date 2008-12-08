@@ -256,7 +256,8 @@ command! SVNBaseDiff   execute "!svn diff % > ~/tmp/svnpatchfile"|
                      \ set patchexpr=MyPatch()|
                      \ vert diffp ~/tmp/svnpatchfile|
                      \ windo set fdm=diff|
-                     \ set patchexpr&
+                     \ set patchexpr&|
+                     \ wincmd p
 
 " Command for entering navigation choice
 command! -nargs=? SetNavChoice call GetNPNavigatonChoiceFromUser("<args>")
