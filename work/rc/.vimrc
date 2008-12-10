@@ -273,8 +273,9 @@ command! -range -nargs=1 Align call AlignVert("<args>")
 command -nargs=0 -count=1 Timestamp call InsertTimestamp("<count>")
 
 if has("unix")
-    " Get all the files in the current directory and then wrap them in quotes
-    command -nargs=0 ListFiles    execute "r !ls"|
+    " Get all the files in the current directory and then wrap them in quotes.
+    " This is intended to be used with C-x C-e command in bash
+    command -nargs=0 WrapLines    set nohls|
                                 \ silent 2,$s/\%(^\|$\)/'/g|
                                 \ silent 1,$-1s/$/ \\/g|
                                 \ normal gg
