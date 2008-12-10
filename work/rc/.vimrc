@@ -142,6 +142,9 @@ nmap \j :tag /Java_.*<C-R><C-W>|            " For searching for a Java native im
 " callee in separate windows
 nmap <C-W><C-T> :sp<CR><C-T>
 
+" Mapping to close the tag
+nmap <C-W>Q :tabc<CR>
+
 " Highlighting mappings. To undo these highligting, do :mat
 nmap \h yiw:call DoHighlight(1)<CR>|         " Normal mode highlighting
 vmap \h y:call DoHighlight()<CR>|            " Visual mode highlighting
