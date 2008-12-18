@@ -627,7 +627,7 @@ function! InsertTimestamp(count) range
         " Only one to insert; and let it remain inline ;)
         normal diw"_dd
         call setpos(".", l:cursor_pos)
-        normal P
+        normal gP
     else
         " We just inserted the last timestamp; now move to where we were
         call setpos(".", l:cursor_pos)
