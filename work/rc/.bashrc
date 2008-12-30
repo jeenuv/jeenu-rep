@@ -111,7 +111,7 @@ function playall()
 {
     {
         find \( -iname \*avi -o -iname \*mp\*g -o -iname \*wmv -o -iname \*dat \) -print0 | \
-        xargs -0 sh -c 'exec mplayer $@ <&3 3<&-';
+        xargs -0 sh -c 'exec mplayer "$@" <&3 3<&-';
     } 3<&0
 }
 
