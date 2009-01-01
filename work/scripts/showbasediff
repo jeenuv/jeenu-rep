@@ -21,7 +21,7 @@ for i; do
         echo "$PROGNAME: $i: no diff found"
         exit
     else
-        vim -n '+set patchexpr=MyPatch()' \
+        vim -n '+set patchexpr=DoSVNPatch()' \
                "+leftabove vertical diffpatch $SVNPATCHFILE|cmap q qa|nmap <F7> ]c|nmap <F6> [c|windo set fdm=diff|normal gg" \
         $i
     fi

@@ -256,7 +256,7 @@ command! TruncW :%s/\s\+$//ce |
 
 " For doing a diff on the BASE version from within Vim
 command! SVNBaseDiff   execute "!svn diff % > ~/tmp/svnpatchfile"|
-                     \ set patchexpr=MyPatch()|
+                     \ set patchexpr=DoSVNPatch()|
                      \ vert diffp ~/tmp/svnpatchfile|
                      \ windo set fdm=diff|
                      \ set patchexpr&|
@@ -635,9 +635,12 @@ function! InsertTimestamp(count) range
 endfu
 
 " To generage patch for SVN. This is used in SVNBaseDiff command as well as
-" showbasediff shell script
-function MyPatch()
-    call system("patch -R -o " . v:fname_out . " " . v:fname_in . " < " .  v:fname_diff)
+" showbasediff shell script too. The --binary option was added for DOS files.
+" Patch ignores and strips the ^M's in diff output from DOS files and hence such
+" patches would fail. The manual says this options wouldn't have any effect in
+" POSIX comliant systems.
+function DoSVNPatch()
+    call system("patch --binary -Ro " . v:fname_out . " " . v:fname_in . " < " .  v:fname_diff)
 endfunction
 
 " ****************************************************
@@ -650,7 +653,7 @@ if &diff
     cmap q qa
 endif
 
-" All set, now search and source the local file and source.
+" All set; now search and source the local file and source.
 " it This file is supposed to contain the system-dependent settings for VIM
 if filereadable($HOME . "/.vimrc.local")
     exe "source " . $HOME . "/.vimrc.local"
