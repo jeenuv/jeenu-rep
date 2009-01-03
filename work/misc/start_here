@@ -1,46 +1,147 @@
 #!/bin/bash
 
-# Get the absolute path for this script
-RC_DIR=$( (cd $(dirname $0)/../rc && pwd) )
+PROGNAME=$(basename $0)
 
-for i in $(find $RC_DIR -name .svn -prune -o -name '.*' -type f -print); do
+function script_echo()
+{
+    local first
+
+    if [ "${1:0:1}" = "-" ]; then
+        first="$1"
+        shift
+        echo "$first $PROGNAME: $@"
+    else
+        echo "$PROGNAME: $@"
+    fi
+}
+
+function execute()
+{
+    if [ "$PRINT_ONLY" -eq 1 ]; then
+        script_echo "will execute: $@"
+        return 1
+    else
+        eval "$@"
+    fi
+}
+
+function make_dirname()
+{
+    local dir_name=$(cd -P "$1" && pwd)
+
+    if [ "$REL_TO_HOME" -eq 1 ]; then
+        echo "$dir_name" | sed "s_^$HOME/__"
+    else
+        echo "$dir_name"
+    fi
+}
+
+BACKUP=0
+REMOVE=0
+PRINT_ONLY=0
+REL_TO_HOME=0
+
+if ! which getopt &>/dev/null; then
+    script_echo "this script needs GNU getopt"
+    exit 1
+fi
+
+OPTS="$(getopt -o "brnh" -n "$PROGNAME" -- "$@")" || exit
+set -- $OPTS
+
+until [ -z "$*" ]; do
+    case "$1" in
+        -b)
+        if [ "$REMOVE" -ne 1 ]; then
+            BACKUP=1
+        else
+            script_echo "option -b can't be used with -r"
+            exit 1
+        fi
+        ;;
+
+        -r)
+        if [ "$BACKUP" -ne 1 ]; then
+            REMOVE=1
+        else
+            script_echo "option -r can't be used with -b"
+            exit 1
+        fi
+        ;;
+
+        -n)
+        PRINT_ONLY=1
+        ;;
+
+        -h)
+        REL_TO_HOME=1
+        ;;
+
+        --)
+        shift
+        break
+        ;;
+    esac
+
+    shift
+done
+
+if [ -n "$*" ]; then
+    script_echo "no arguments accepted"
+    exit 1
+fi
+
+# We need to find relative path of RC_DIR w.r.t the $HOME directory
+RC_DIR=$(make_dirname "$(dirname $0)/../rc")
+BIN_DIR=$(make_dirname "$(dirname $0)/../scripts")
+
+cd "$HOME"
+
+for i in $(find "$RC_DIR" -name .svn -prune -o -name '.*' -type f -print); do
     NAME=$(basename $i)
 
     if [ -e "$HOME/$NAME" ]; then
-        if [ "$1" == "-b" ]; then
+        if [ "$BACKUP" -eq 1 ]; then
             # Rename the existing file
-            mv $HOME/$NAME{,.old}
+            execute mv $NAME{,.old}
+        elif [ "$REMOVE" -eq 1 ]; then
+            # Check the target of the link
+            execute rm -i "$HOME/$NAME"
         else
             # Skip creating links if file aleady exists
-            echo "Skipped: $NAME"
+            script_echo "$HOME/$NAME exists; skipped"
             continue
         fi
     fi
 
-    echo "Creating symbolic link: $NAME"
-    ln -s $i "$HOME/$NAME"
+    execute ln -s "$i" && script_echo "created symbolic link: $HOME/$NAME"
 done
 
-[ ! -d "$HOME/tmp" ] && mkdir "$HOME/tmp"
-[ ! -d "$HOME/bin" ] && mkdir "$HOME/bin"
+[ ! -d "$HOME/tmp" ] && mkdir "$HOME/tmp" && script_echo "created directory $HOME/tmp"
+[ ! -d "$HOME/bin" ] && mkdir "$HOME/bin" && script_echo "created directory $HOME/bin"
 
 echo
-BIN_DIR=$( (cd $(dirname $0)/../scripts && pwd) )
 for i in $(find "$BIN_DIR" -name .svn -prune -o -type f -print); do
     NAME=$(basename $i)
 
     if [ ! -e "$HOME/bin/$NAME" ]; then
-        echo "Creating symbolic link to $NAME"
-        ln -s "$i" "$HOME/bin/$NAME"
+        execute ln -s "$i" "bin" && script_echo "created symbolic link: $HOME/bin/$NAME"
+    elif [ "$REMOVE" -eq 1 ]; then
+        execute rm -i "$HOME/bin/$NAME" && execute ln -s "$i" "bin" && \
+        script_echo "created symbolic link: $HOME/bin/$NAME"
     else
         # Skip creating links if file aleady exists
-        echo "Skipped: $NAME"
+        script_echo "$HOME/bin/$NAME exists; skipped"
     fi
 done
 
 # A softlink for gvimproj to vimproj
-echo "Creating symbolic link: gvimproj"
-ln -s "$BIN_DIR/vimproj" "$HOME/bin/gvimproj"
+if [ ! -e "$HOME/bin/gvimproj" ]; then
+    execute ln -s "$BIN_DIR/vimproj" "$HOME/bin/gvimproj" && \
+    script_echo "created symbolic link: gvimproj"
+else
+    script_echo "$HOME/bin/gvimproj exists; skipped"
+fi
 
 # Create a vim project directory
-[ ! -d ~/vimproj ] && mkdir ~/vimproj
+[ ! -d ~/vimproj ] && mkdir ~/vimproj && script_echo "created directory $HOME/vimproj"
