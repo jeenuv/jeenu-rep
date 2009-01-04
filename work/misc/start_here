@@ -6,7 +6,7 @@ function script_echo()
 {
     local first
 
-    if [ "$#" -gt 1 ]; then
+    if [ "${1:0:1}" = "-" ]; then
         first="$1"
         shift
         echo "$first" "$PROGNAME: $@"
@@ -27,12 +27,44 @@ function execute()
 
 function make_dirname()
 {
-    local dir_name=$(cd -P "$1" && pwd)
+    local dir_name=$(cd -P "$(dirname $0)/$1" && pwd)
 
     if [ "$REL_TO_HOME" -eq 1 ]; then
         echo "$dir_name" | sed "s_^$HOME/__"
     else
         echo "$dir_name"
+    fi
+}
+
+function create_dir()
+{
+    if [ ! -d "$1" ]; then
+        execute mkdir -p "$1" && script_echo "created directory $1"
+    else
+        script_echo "directory $1 exists; skipped"
+    fi
+}
+
+function create_link()
+{
+    [ -z "$TARGET_DIR" ] && script_echo "\$TARGET_DIR is null!" && return 1
+    [ -z "$NAME" ] && script_echo "\$NAME is null!" && return 1
+    [ -z "$i" ] && script_echo "\$i is null!" && return 1
+
+    if [ ! -f "$TARGET_DIR/$NAME" ]; then
+        execute ln -s "${PREFIX}$i" "$TARGET_DIR" && script_echo "created symbolic link: $TARGET_DIR/$NAME"
+    elif [ "$REMOVE" -eq 1 ]; then
+        if [ -h "$TARGET_DIR/$NAME" ]; then
+            # If it's soft link, there's no harm in removing it
+            RM_FLAG=-f
+        else
+            RM_FLAG=-i
+        fi
+        execute rm "$RM_FLAG" "$TARGET_DIR/$NAME" && execute ln -s "${PREFIX}$i" "$TARGET_DIR" && \
+        script_echo "created symbolic link: $TARGET_DIR/$NAME"
+    else
+        # Skip creating links if file aleady exists
+        script_echo "$TARGET_DIR/$NAME exists; skipped"
     fi
 }
 
@@ -46,7 +78,7 @@ Usage: $PROGNAME [-nrhb]
 -n          do not execute any command; print it instead
 -r          remove any existing files; removals are interactive
 -h          create soft links with target path relative to \$HOME
--b          backup if file already exists
+-b          backup if file already exists (applicable only to rc files)
 
 -r and -b are mutually exclusive"
 
@@ -106,56 +138,60 @@ if [ -n "$*" ]; then
 fi
 
 # We need to find relative path of RC_DIR w.r.t the $HOME directory
-RC_DIR=$(make_dirname "$(dirname $0)/../rc")
-BIN_DIR=$(make_dirname "$(dirname $0)/../scripts")
+RC_DIR=$(make_dirname ../rc)
+BIN_DIR=$(make_dirname ../scripts)
+VIM_DIR=$(make_dirname ../vim)
 
 cd "$HOME"
 
+# Create symbolic links for all rc files
+TARGET_DIR="$HOME"
 for i in $(find "$RC_DIR" -name .svn -prune -o -name '.*' -type f -print); do
     NAME=$(basename $i)
 
-    if [ -e "$HOME/$NAME" ]; then
-        if [ "$BACKUP" -eq 1 ]; then
-            # Rename the existing file
-            execute mv $NAME{,.old}
-        elif [ "$REMOVE" -eq 1 ]; then
-            # Check the target of the link
-            execute rm -i "$HOME/$NAME"
-        else
-            # Skip creating links if file aleady exists
-            script_echo "$HOME/$NAME exists; skipped"
-            continue
-        fi
+    if [ "$BACKUP" -eq 1 ]; then
+        # Rename the existing file
+        execute mv $NAME{,.old}
     fi
 
-    execute ln -s "$i" && script_echo "created symbolic link: $HOME/$NAME"
+    create_link
 done
 
-[ ! -d "$HOME/tmp" ] && mkdir "$HOME/tmp" && script_echo "created directory $HOME/tmp"
-[ ! -d "$HOME/bin" ] && mkdir "$HOME/bin" && script_echo "created directory $HOME/bin"
-
+# Create symbolic links for scripts. There's no point in backing up these since
+# backed up files end up in $PATH
 echo
+TARGET_DIR="$HOME/bin"
+create_dir "$TARGET_DIR"
+if [ "$REL_TO_HOME" -eq 1 ]; then
+    PREFIX=../
+else
+    PREFIX=
+fi
 for i in $(find "$BIN_DIR" -name .svn -prune -o -type f -print); do
     NAME=$(basename $i)
-
-    if [ ! -e "$HOME/bin/$NAME" ]; then
-        execute ln -s "$i" "bin" && script_echo "created symbolic link: $HOME/bin/$NAME"
-    elif [ "$REMOVE" -eq 1 ]; then
-        execute rm -i "$HOME/bin/$NAME" && execute ln -s "$i" "bin" && \
-        script_echo "created symbolic link: $HOME/bin/$NAME"
-    else
-        # Skip creating links if file aleady exists
-        script_echo "$HOME/bin/$NAME exists; skipped"
-    fi
+    create_link
 done
 
 # A softlink for gvimproj to vimproj
-if [ ! -e "$HOME/bin/gvimproj" ]; then
-    execute ln -s "$BIN_DIR/vimproj" "$HOME/bin/gvimproj" && \
-    script_echo "created symbolic link: gvimproj"
-else
-    script_echo "$HOME/bin/gvimproj exists; skipped"
-fi
+execute cp -df "$TARGET_DIR/vimproj" "$TARGET_DIR/gvimproj" && \
+script_echo "created symbolic link: $TARGET_DIR/gvimproj"
 
-# Create a vim project directory
-[ ! -d ~/vimproj ] && mkdir ~/vimproj && script_echo "created directory $HOME/vimproj"
+# Create ~/.vim and put all the custom vimfiles inside. Note that my .vimrc
+# contains ~/.vim added to runtime path so that I can get customs by running
+# the command :ru jeenu/some.vim
+echo
+TARGET_DIR="$HOME/.vim/jeenu"
+create_dir "$TARGET_DIR"
+if [ "$REL_TO_HOME" -eq 1 ]; then
+    PREFIX=../../
+else
+    PREFIX=
+fi
+for i in $(find "$VIM_DIR" -name .svn -prune -o -type f -print); do
+    NAME=$(basename $i)
+    create_link
+done
+
+echo
+create_dir "$HOME/tmp"
+create_dir "$HOME/vimproj"

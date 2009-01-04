@@ -72,6 +72,9 @@ set wildignore+=*.so
 " to select the desired item!
 set wildmenu
 
+" This set so that I can run :ru jeenu/some.vim so that I get my desired settings
+set runtimepath+=~/.vim
+
 " Options for GUI/Terminal
 if has("gui_running")
     " Select the torte coloscheme for GUI
@@ -636,9 +639,10 @@ endfu
 
 " To generage patch for SVN. This is used in SVNBaseDiff command as well as
 " showbasediff shell script too. The --binary option was added for DOS files.
-" Patch ignores and strips the ^M's in diff output from DOS files and hence such
-" patches would fail. The manual says this options wouldn't have any effect in
-" POSIX comliant systems.
+" Patch ignores and strips the ^M's in diff output from DOS files and hence
+" such patches would fail. The manual says this options wouldn't have any
+" effect in POSIX comliant systems and hence is harmless when use in other
+" situations
 function DoSVNPatch()
     call system("patch --binary -Ro " . v:fname_out . " " . v:fname_in . " < " .  v:fname_diff)
 endfunction
