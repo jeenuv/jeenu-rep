@@ -6,10 +6,10 @@ function script_echo()
 {
     local first
 
-    if [ "${1:0:1}" = "-" ]; then
+    if [ "$#" -gt 1 ]; then
         first="$1"
         shift
-        echo "$first $PROGNAME: $@"
+        echo "$first" "$PROGNAME: $@"
     else
         echo "$PROGNAME: $@"
     fi
@@ -41,12 +41,21 @@ REMOVE=0
 PRINT_ONLY=0
 REL_TO_HOME=0
 
+USAGE="\
+Usage: $PROGNAME [-nrhb]
+-n          do not execute any command; print it instead
+-r          remove any existing files; removals are interactive
+-h          create soft links with target path relative to \$HOME
+-b          backup if file already exists
+
+-r and -b are mutually exclusive"
+
 if ! which getopt &>/dev/null; then
     script_echo "this script needs GNU getopt"
     exit 1
 fi
 
-OPTS="$(getopt -o "brnh" -n "$PROGNAME" -- "$@")" || exit
+OPTS="$(getopt -o "brnh" -l 'help' -n "$PROGNAME" -- "$@")" || exit
 set -- $OPTS
 
 until [ -z "$*" ]; do
@@ -75,6 +84,11 @@ until [ -z "$*" ]; do
 
         -h)
         REL_TO_HOME=1
+        ;;
+
+        --help)
+        echo "$USAGE"
+        exit
         ;;
 
         --)
