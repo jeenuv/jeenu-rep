@@ -1,6 +1,6 @@
 
 # Indicate that the bookmarks are not changed
-changed_bm=0
+CHANGED_BM=0
 
 # Default bookmark profile
 profile_bm="$HOME/.book"
@@ -8,7 +8,7 @@ profile_bm="$HOME/.book"
 # Read the bookmarks
 function bmread()
 {
-    if [ "$changed_bm" -ne 0 ]; then
+    if [ "$CHANGED_BM" -ne 0 ]; then
         # There are new/changed book marks
         REPLY=
         echo "bmread: There are new bookmarks. Identical bookmarks will be overwritten when reading."
@@ -38,7 +38,7 @@ function bmread()
         fi
     fi
 
-    changed_bm=0
+    CHANGED_BM=0
     return 0
 }
 
@@ -62,7 +62,7 @@ function bm()
             return
         else
             unset bm_$2
-            changed_bm=1
+            CHANGED_BM=1
         fi
     else
         if { echo "$1" | grep '^[0-9]' || echo "$1" | grep '[^0-9A-Za-z_]'; } > /dev/null; then
@@ -76,13 +76,13 @@ function bm()
             read -p "bm: bookmark '$1' already defined. overwrite (y/n)? "
             if [ "$REPLY" = "y" -o "$REPLY" = "Y" ]; then
                 export bm_$1="$(pwd -P)"
-                changed_bm=1
+                CHANGED_BM=1
             else
                 echo "bm: bookmark discarded"
             fi
         else
             export bm_$1="$(pwd -P)"
-            changed_bm=1
+            CHANGED_BM=1
         fi
     fi
 }
@@ -122,6 +122,8 @@ function bms()
 
 function bmwrite()
 {
+    local template=0
+
     if [ "$(stat -c %Y "$profile_bm")" -gt "$ts_bm" ]; then
         # Bookmark file has been written by some one else, since the time we read it.
         # This means that there are new bookmarks defined. So better read them
@@ -132,11 +134,28 @@ function bmwrite()
         fi
     fi
 
-    if [ "$changed_bm" -ne 0 ]; then
+    if [ "$1" = "-t" ]; then
+        if [ -z "$TEMPLATE_BM" ]; then
+            echo "bmwrite: template is empty; -t ignored"
+        else
+            template=1
+        fi
+    fi
+
+    if [ "$CHANGED_BM" -ne 0 ]; then
         echo "#BOOKMARK" > "$profile_bm"
-        set | awk '/^bm_/{print "export " $0}' >> "$profile_bm"
+        if [ "$template" -eq 1 ]; then
+            set |
+            grep '^bm_' |
+            while read i; do
+                echo "$i" | sed "s#=$TEMPLATE_BM#=\$TEMPLATE_BM#" >> "$profile_bm"
+            done
+        else
+            set | awk '/^bm_/{print "export " $0}' >> "$profile_bm"
+        fi
+
         echo "bmwrite: bookmarks saved"
-        changed_bm=0
+        CHANGED_BM=0
         ts_bm=$(stat -c %Y "$profile_bm")
     else
         echo "bmwrite: no bookmark changes"
@@ -175,6 +194,21 @@ function bmprofile()
     fi
 }
 
+function bmtemplate()
+{
+    if [ -z "$*" ]; then
+        export TEMPLATE_BM=$(pwd -P)
+    else
+        if [ "${1:0:1}" != "/" ]; then
+            echo "bmtemplate: argument should be an absolute path"
+            return 1
+        fi
+    fi
+
+    echo "bmtemplate: template set to $TEMPLATE_BM"
+    return 0
+}
+
 function _bm_complete()
 {
     local BKMS CUR
@@ -190,5 +224,6 @@ function _bm_complete()
 
 complete -F _bm_complete go
 complete -F _bm_complete bm
+complete -o dirnames bmtemplate
 
 # vim:ft=sh:
