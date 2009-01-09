@@ -111,6 +111,10 @@ if has("gui_running")
         " Use forward slashes on filename completion
         set shellslash
     endif
+
+    " I don't want tool and menu bars!
+    set guioptions-=m
+    set guioptions-=T
 else
     " Currently selected colorscheme; doesn't look bad
     colorscheme desert
