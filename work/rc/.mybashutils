@@ -1,9 +1,10 @@
+#!/bin/bash
 
 # Indicate that the bookmarks are not changed
 CHANGED_BM=0
 
 # Default bookmark profile
-profile_bm="$HOME/.book"
+PROFILE_BM="$HOME/.book"
 
 # Read the bookmarks
 function bmread()
@@ -15,12 +16,12 @@ function bmread()
         read -p "You want to continue (y/n)? "
         if [ "$REPLY" = "y" -o "$REPLY" = "Y" ]; then
             # Sanity check
-            if [ "$(cat "$profile_bm" | sed '1q')" != "#BOOKMARK" ]; then
+            if [ "$(cat "$PROFILE_BM" | sed '1q')" != "#BOOKMARK" ]; then
                 echo "bmread: invalid bookmark profile"
                 return 1
             else
-                source "$profile_bm"
-                ts_bm=$(stat -c %Y "$profile_bm")
+                source "$PROFILE_BM"
+                ts_bm=$(stat -c %Y "$PROFILE_BM")
                 return 0
             fi
         else
@@ -28,13 +29,13 @@ function bmread()
         fi
     else
         # Sanity check
-        if [ "$(cat "$profile_bm" | sed '1q')" != "#BOOKMARK" ]; then
+        if [ "$(cat "$PROFILE_BM" | sed '1q')" != "#BOOKMARK" ]; then
             echo "bmread: invalid bookmark profile"
             return 1
         else
             unset ${!bm_*}
-            source "$profile_bm"
-            ts_bm=$(stat -c %Y "$profile_bm")
+            source "$PROFILE_BM"
+            ts_bm=$(stat -c %Y "$PROFILE_BM")
         fi
     fi
 
@@ -124,7 +125,7 @@ function bmwrite()
 {
     local template=0
 
-    if [ "$(stat -c %Y "$profile_bm")" -gt "$ts_bm" ]; then
+    if [ "$(stat -c %Y "$PROFILE_BM")" -gt "$ts_bm" ]; then
         # Bookmark file has been written by some one else, since the time we read it.
         # This means that there are new bookmarks defined. So better read them
         echo "bmwrite: The bookmark file is more recent than when you read it. It'll be re-read before writing"
@@ -134,29 +135,25 @@ function bmwrite()
         fi
     fi
 
-    if [ "$1" = "-t" ]; then
-        if [ -z "$TEMPLATE_BM" ]; then
-            echo "bmwrite: template is empty; -t ignored"
-        else
-            template=1
-        fi
+    if [ -n "$TEMPLATE_BM" ]; then
+        template=1
     fi
 
     if [ "$CHANGED_BM" -ne 0 ]; then
-        echo "#BOOKMARK" > "$profile_bm"
+        echo "#BOOKMARK" > "$PROFILE_BM"
         if [ "$template" -eq 1 ]; then
             set |
             grep '^bm_' |
             while read i; do
-                echo "$i" | sed "s#=$TEMPLATE_BM#=\$TEMPLATE_BM#" >> "$profile_bm"
+                echo "$i" | sed "s#=$TEMPLATE_BM#=\$TEMPLATE_BM#" >> "$PROFILE_BM"
             done
         else
-            set | awk '/^bm_/{print "export " $0}' >> "$profile_bm"
+            set | awk '/^bm_/{print "export " $0}' >> "$PROFILE_BM"
         fi
 
         echo "bmwrite: bookmarks saved"
         CHANGED_BM=0
-        ts_bm=$(stat -c %Y "$profile_bm")
+        ts_bm=$(stat -c %Y "$PROFILE_BM")
     else
         echo "bmwrite: no bookmark changes"
     fi
@@ -168,7 +165,7 @@ function bmprofile()
     local arg="$1"
 
     if [ "$#" -eq 0 -o -z "$1" ]; then
-        echo "bmprofile: your current bookmark profile is '$profile_bm'"
+        echo "bmprofile: your current bookmark profile is '$PROFILE_BM'"
         return
     fi
 
@@ -177,7 +174,7 @@ function bmprofile()
         arg="$( (cd -P $(dirname "$arg") && pwd) )/$(basename "$arg")"
     fi
 
-    old_profile="$profile_bm"
+    old_profile="$PROFILE_BM"
 
     if [ -d "$arg" ]; then
         echo "bmprofile: '$arg' is a directory"
@@ -186,10 +183,10 @@ function bmprofile()
         echo "#BOOKMARK" > "$arg"
     fi
 
-    profile_bm="$arg"
+    PROFILE_BM="$arg"
 
     if ! bmread; then
-        profile_bm="$old_profile"
+        PROFILE_BM="$old_profile"
         echo "bmprofile: old bookmark profile restored"
     fi
 }
@@ -199,6 +196,7 @@ function bmtemplate()
     if [ -z "$*" ]; then
         export TEMPLATE_BM=$(pwd -P)
     else
+        export TEMPLATE_BM="$1"
         if [ "${1:0:1}" != "/" ]; then
             echo "bmtemplate: argument should be an absolute path"
             return 1
@@ -225,5 +223,3 @@ function _bm_complete()
 complete -F _bm_complete go
 complete -F _bm_complete bm
 complete -o dirnames bmtemplate
-
-# vim:ft=sh:
