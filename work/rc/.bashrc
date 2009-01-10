@@ -136,12 +136,12 @@ function rm()
     fi
 
     if [ -z "$*" ]; then
-        $actual_rm "$@"
+        command rm "$@"
         return
     fi
 
     local saved_args=("$@")
-    local rm_command=$(getopt -o "rR" -l 'recursive' -q -- "$@")
+    eval set -- $(getopt -o "rR" -l 'recursive' -q -- "$@")
 
     if [ "$?" -ne 0 -a "$?" -ne 1 ]; then
         echo "rm: 'getopt' returned error"
@@ -149,17 +149,15 @@ function rm()
         return 1
     fi
 
-    set -- $rm_command
     until [ -z "$*" ]; do
-        case "$1" in
+        case $1 in
             -r | -R | --recursive)
             recursive=1
-            break;
+            break
             ;;
 
             --)
             shift
-            break;
         esac
 
         shift
@@ -176,10 +174,10 @@ function rm()
             echo "rm: $must"
             return 1
         else
-            $actual_rm "$@"
+            command rm "$@"
         fi
     else
-        $actual_rm "$@"
+        command rm "$@"
     fi
 }
 
