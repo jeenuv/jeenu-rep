@@ -116,6 +116,73 @@ function playall()
     } 3<&0
 }
 
+# Wrapper function to capture rm -rf commands
+function rm()
+{
+    local actual_rm="$(which rm)"
+    local must="Thou shalt invoke $actual_rm explicitly"
+    local recursive=0
+
+    if ! which getopt >/dev/null; then
+        echo "rm: This function requires GNU getopt in \$PATH"
+        echo "rm: $must"
+        return 1
+    fi
+
+    if ! which uuidgen >/dev/null; then
+        echo "rm: This function requires uuidgen utility in \$PATH"
+        echo "rm: $must"
+        return 1
+    fi
+
+    if [ -z "$*" ]; then
+        $actual_rm "$@"
+        return
+    fi
+
+    local saved_args=("$@")
+    local rm_command=$(getopt -o "rR" -l 'recursive' -q -- "$@")
+
+    if [ "$?" -ne 0 -a "$?" -ne 1 ]; then
+        echo "rm: 'getopt' returned error"
+        echo "rm: $must"
+        return 1
+    fi
+
+    set -- $rm_command
+    until [ -z "$*" ]; do
+        case "$1" in
+            -r | -R | --recursive)
+            recursive=1
+            break;
+            ;;
+
+            --)
+            shift
+            break;
+        esac
+
+        shift
+    done
+
+    set -- "${saved_args[@]}"
+
+    # Check if the user specified a -r
+    if [ "$recursive" -eq 1 ]; then
+        local mark="$(uuidgen | awk -F- '{print toupper($2)}')"
+        echo "rm: You are trying to use rm command with -r. To proceed, enter the following text below: $mark" && read
+        if [ "$REPLY" != "$mark" ]; then
+            echo "rm: Command aborted"
+            echo "rm: $must"
+            return 1
+        else
+            $actual_rm "$@"
+        fi
+    else
+        $actual_rm "$@"
+    fi
+}
+
 ############################
 ### Completion functions ###
 ############################
