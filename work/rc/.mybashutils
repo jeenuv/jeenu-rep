@@ -176,11 +176,17 @@ function bmprofile()
 
     old_profile="$PROFILE_BM"
 
-    if [ -d "$arg" ]; then
-        echo "bmprofile: '$arg' is a directory"
-        return 1
-    elif [ ! -f "$arg" ]; then
-        echo "#BOOKMARK" > "$arg"
+    if [ -e "$arg" ]; then
+        if [ -d "$arg" ]; then
+            echo "bmprofile: '$arg' is a directory"
+            return 1
+        fi
+    else
+        if confirm "bmprofile: $arg doesn't exist; you want to create it?"; then
+            echo "#BOOKMARK" > "$arg"
+        else
+            return 1
+        fi
     fi
 
     PROFILE_BM="$arg"
