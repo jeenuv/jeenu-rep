@@ -118,7 +118,7 @@ function bms()
 {
     [ "$#" -ne 0 ] && { echo "bms: no arguments accepted"; return; }
     printf "%-20s %s\n%-20s %s\n" Bookmark Location ========== ==========
-    set | awk -F= '/^bm_/{sub("^bm_", ""); printf "%-20s %s\n", $1, $2}'
+    env | awk -F= '/^bm_/{sub("^bm_", ""); printf "%-20s %s\n", $1, $2}'
 }
 
 function bmwrite()
@@ -142,13 +142,13 @@ function bmwrite()
     if [ "$CHANGED_BM" -ne 0 ]; then
         echo "#BOOKMARK" > "$PROFILE_BM"
         if [ "$template" -eq 1 ]; then
-            set |
+            env |
             grep '^bm_' |
             while read i; do
                 echo "$i" | sed "s#=$TEMPLATE_BM#=\$TEMPLATE_BM#" >> "$PROFILE_BM"
             done
         else
-            set | awk '/^bm_/{print "export " $0}' >> "$PROFILE_BM"
+            env | awk '/^bm_/{print "export " $0}' >> "$PROFILE_BM"
         fi
 
         echo "bmwrite: bookmarks saved"
@@ -215,7 +215,7 @@ function _bm_complete()
     CUR=${COMP_WORDS[$COMP_CWORD]}
 
     if [ \( "${COMP_WORDS[0]}" = "go" -a "$COMP_CWORD" -eq 1 \) -o \( "${COMP_WORDS[0]}" = "bm" -a "$COMP_CWORD" -eq 2 \) ]; then
-        BKMS=$(set | sed -n 's/^bm_\([^=]*\).*$/\1/p' | sed -n ':a;$!{N;ba};${s/\n/ /g;p}')
+        BKMS=$(env | sed -n 's/^bm_\([^=]*\).*$/\1/p' | sed -n ':a;$!{N;ba};${s/\n/ /g;p}')
         COMPREPLY=($(compgen -W "$BKMS" $CUR))
     fi
 }
