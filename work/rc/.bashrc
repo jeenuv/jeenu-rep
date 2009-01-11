@@ -70,6 +70,23 @@ function launch()
     eval "$ARG_LIST &>/dev/null &"
 }
 
+# Funtion to ask y/n questions
+function confirm()
+{
+    if [ -z "$*" ]; then
+        return 1
+    fi
+
+    echo -n "$1 (y/n) "
+    read
+    if [ "$REPLY" = "y" -o "$REPLY" = "Y" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+export -f confirm
+
 # Function to go up in the directory; level is specified as argument
 function up()
 {
@@ -120,18 +137,18 @@ function playall()
 function rm()
 {
     local actual_rm="$(which rm)"
-    local must="Thou shalt invoke $actual_rm explicitly"
+    local must="rm: Thou shalt invoke $actual_rm explicitly"
     local recursive=0
 
     if ! which getopt >/dev/null; then
         echo "rm: This function requires GNU getopt in \$PATH"
-        echo "rm: $must"
+        echo "$must"
         return 1
     fi
 
     if ! which uuidgen >/dev/null; then
         echo "rm: This function requires uuidgen utility in \$PATH"
-        echo "rm: $must"
+        echo "$must"
         return 1
     fi
 
@@ -145,7 +162,7 @@ function rm()
 
     if [ "$?" -ne 0 -a "$?" -ne 1 ]; then
         echo "rm: 'getopt' returned error"
-        echo "rm: $must"
+        echo "$must"
         return 1
     fi
 
@@ -153,11 +170,12 @@ function rm()
         case $1 in
             -r | -R | --recursive)
             recursive=1
-            break
             ;;
 
             --)
             shift
+            local arguments="$@"
+            ;;
         esac
 
         shift
@@ -168,10 +186,11 @@ function rm()
     # Check if the user specified a -r
     if [ "$recursive" -eq 1 ]; then
         local mark="$(uuidgen | awk -F- '{print toupper($2)}')"
-        echo "rm: You are trying to use rm command with -r. To proceed, enter the following text below: $mark" && read
+        echo "rm: To proceed, enter the following text below: $mark"
+        echo -n "** $arguments **: " && read
         if [ "$REPLY" != "$mark" ]; then
             echo "rm: Command aborted"
-            echo "rm: $must"
+            echo "$must"
             return 1
         else
             command rm "$@"
