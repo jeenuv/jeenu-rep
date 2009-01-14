@@ -142,7 +142,7 @@ function bmwrite()
                 echo "$i" | sed "s#=$TEMPLATE_BM#=\$TEMPLATE_BM#" >> "$PROFILE_BM"
             done
         else
-            set | awk '/^bm_/{print "export " $0}' >> "$PROFILE_BM"
+            set | awk '/^bm_/{string=gensub("(=|$)", "\\1\"", "g"); print string}' >> "$PROFILE_BM"
         fi
 
         echo "bmwrite: Bookmarks saved"
