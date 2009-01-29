@@ -664,5 +664,5 @@ endif
 " All set; now search and source the local file and source.
 " it This file is supposed to contain the system-dependent settings for VIM
 if filereadable($HOME . "/.vimrc.local")
-    exe "source " . $HOME . "/.vimrc.local"
+    exe "source " . escape($HOME, ' \') . "/.vimrc.local"
 endif
