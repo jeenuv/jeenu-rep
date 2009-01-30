@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DISPLAY=
-USAGE="Usage: $(basename $0) filename rev1 rev2 [svn-options]"
+USAGE="Usage: $(basename "$0") filename rev1 rev2 [svn-options]"
 
 if [ "$#" -lt 3 ]; then
     echo "$USAGE"
@@ -15,7 +15,7 @@ REV2="$3"
 shift 3
 
 if [ ! -f "$FILE" ]; then
-    echo "$(basename $0): file doesn't exist: $FILE"
+    echo "$(basename "$0"): file doesn't exist: $FILE"
     exit 1
 fi
 

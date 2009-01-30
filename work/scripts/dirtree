@@ -10,7 +10,7 @@ FINDPAT='-name .svn -prune -o -type d -printf %h/%f\040\052\n'
 PATSRCH=0
 DISPLAYCMD='less'
 
-USAGE="$(basename $0) [--extension=EXTNS] [--all] [--stdout] [--depth=DEPTH] [DIRNAME [DIRNAME]]
+USAGE="$(basename "$0") [--extension=EXTNS] [--all] [--stdout] [--depth=DEPTH] [DIRNAME [DIRNAME]]
 	--extension: display files that end with EXTNS where EXTNS is like EXTN1,EXTN2
 	--all: display all files
 	--stdout: print display to stdout
@@ -124,7 +124,7 @@ do
     then
         cd "$i" && find . $FINDPAT | sed "/\.svn/d;s_^\./__;s_[^/]\+/_    _g;s_^\( \+\)_&\`- _"
     else
-        echo "**$(basename $0): no such directory: $i**"
+        echo "**$(basename "$0"): no such directory: $i**"
     fi
 
     echo

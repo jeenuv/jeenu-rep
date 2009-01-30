@@ -6,7 +6,7 @@ if ! echo $0 | grep 'gvimproj'; then
 fi
 
 PROJECT=
-EXE_NAME="$(basename $0)"
+EXE_NAME="$(basename "$0")"
 EXE_NAME="${EXE_NAME%proj}"
 
 if ! which &>/dev/null "$EXE_NAME"; then

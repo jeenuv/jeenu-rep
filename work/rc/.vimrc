@@ -648,7 +648,7 @@ endfu
 " effect in POSIX comliant systems and hence is harmless when use in other
 " situations
 function DoSVNPatch()
-    call system("patch --binary -Ro " . v:fname_out . " " . v:fname_in . " < " .  v:fname_diff)
+    call system("patch --binary -Ro " . escape(v:fname_out, ' \') . " " . escape(v:fname_in, ' \') . " < " .  escape(v:fname_diff, ' \'))
 endfunction
 
 " ****************************************************

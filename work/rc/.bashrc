@@ -38,8 +38,8 @@ alias Q="grep -v .svn/ > ~/tmp/errors && env -u DISPLAY vim -q ~/tmp/errors"
 export PS1='\e[22;31m\H\e[00m [\e[22;32m\w\e[00m]\n\! $ '
 export PS3='> '
 
-# Seems like this is not needed as this is done from .bash_profile
-# echo $PATH | grep $HOME/bin >/dev/null || export PATH=~/bin:$PATH
+# Even if this is done from bash_profile, it's safe to have it here
+echo $PATH | grep "$HOME/bin" >/dev/null || export PATH=~/bin:$PATH
 
 export EDITOR='env -u DISPLAY vim'
 export SVN_EDITOR='env -u DISPLAY vim "+set tw=100"'

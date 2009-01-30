@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROGNAME=$(basename $0)
+PROGNAME=$(basename "$0")
 
 USAGE="$PROGNAME usage: $PROGNAME OPERATION [OPTIONS] LEFT RIGHT 
 OPERATION can be one of
