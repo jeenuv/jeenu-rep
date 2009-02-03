@@ -47,6 +47,11 @@ export SVN_EDITOR='env -u DISPLAY vim "+set tw=100"'
 # Make the shell ignore the .svn when completing file/directory names
 export FIGNORE=".svn:.o:~"
 
+# Create a tmp directory
+if [ ! -d ~/tmp ]; then
+    mkdir ~/tmp
+fi
+
 ###########################
 #### Utility Functions ####
 ###########################
