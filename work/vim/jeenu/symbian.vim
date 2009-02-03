@@ -23,11 +23,6 @@ execute "setl softtabstop=" . &tabstop
 " Don't display tabs and trailing spaces
 set nolist
 
-" Since Symbian don't keep spaces around operators, it might be
-" annoying to see them blended into normal text syntax. So just need
-" to color them according to some C operators
-" syntax match cOperator /[!=<>~+-,]\|\/[^/*]\|\*[^/]/
-
 " Mappings for function browsing
 nnoremap <silent> <buffer> ]] :call <SID>SymbianJump('/^\t{')<CR>
 nnoremap <silent> <buffer> ][ :call <SID>SymbianJump('/^\t}')<CR>
