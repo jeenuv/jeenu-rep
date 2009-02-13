@@ -75,6 +75,11 @@ set wildmenu
 " This set so that I can run :ru jeenu/some.vim so that I get my desired settings
 set runtimepath+=~/.vim
 
+" If running under Cygwin, we need to add \ to file name characters
+if $PATH =~? "/cygdrive"
+    set isf+=\\
+endif
+
 " Options for GUI/Terminal
 if has("gui_running")
     " Select the torte coloscheme for GUI
@@ -181,11 +186,11 @@ cmap <C-Z> <Left>
 cmap <C-X> <Right>
 
 " Search using visual selection
-vmap * y/\<<C-R>=escape("<C-R>"", "$.*/~[]?")<CR>\><CR>
-vmap # y?\<<C-R>=escape("<C-R>"", "$.*/~[]?")<CR>\><CR>
+vmap * y/\<<C-R>=escape('<C-R>"', '$.*/~[]?\')<CR>\><CR>
+vmap # y?\<<C-R>=escape('<C-R>"', '$.*/~[]?\')<CR>\><CR>
 
-vmap g* y/<C-R>=escape("<C-R>"", "$.*/~[]?")<CR><CR>
-vmap g# y?<C-R>=escape("<C-R>"", "$.*/~[]?")<CR><CR>
+vmap g* y/<C-R>=escape('<C-R>"', '$.*/~[]?\')<CR><CR>
+vmap g# y?<C-R>=escape('<C-R>"', '$.*/~[]?\')<CR><CR>
 
 " Wrap selection with selected character
 vmap \w :call GetWrapperChoiceFromUser()<CR>
