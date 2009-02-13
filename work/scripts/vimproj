@@ -5,7 +5,7 @@ if ! echo $0 | grep 'gvimproj'; then
     export DISPLAY=
 fi
 
-PROJECT=
+PROJECT_NAME=
 EXE_NAME="$(basename "$0")"
 EXE_NAME="${EXE_NAME%proj}"
 
@@ -20,28 +20,34 @@ if [ -z "$1" -o ! -d "$HOME/vimproj/$1" ]; then
     # All directory in the $HOME/vimproj directory
     PROJECTS="$( (cd "$HOME/vimproj" && find -maxdepth 1 -type d -printf "%f " | sed 's/\.//') )"
 elif [ -d "$HOME/vimproj/$1" ]; then
-    PROJECT=$1
+    PROJECT_NAME=$1
     shift
 fi
 
-if [ -z "$PROJECT" ]; then
+if [ -z "$PROJECT_NAME" ]; then
     # The arugment that user provided is either not valid or empty
 
     echo "Select one from below:"
-    select PROJECT in $(eval echo "$PROJECTS"); do
-        [ -n "$PROJECT" ] && break
+    select PROJECT_NAME in $(eval echo "$PROJECTS"); do
+        [ -n "$PROJECT_NAME" ] && break
     done
 
     # Unset $1
     shift
 fi
 
+export PROJECT_NAME
+export PROJECT_LOC="$HOME/vimproj/$PROJECT_NAME"
+
 # if there's vimrc file
-if [ -f "$HOME/vimproj/$PROJECT/vimrc" ]; then
-    COMMAND="$COMMAND -S $HOME/vimproj/$PROJECT/vimrc"
+if [ -f "$PROJECT_LOC/vimrc" ]; then
+    COMMAND="$COMMAND -S $PROJECT_LOC/vimrc"
 fi
 
 # Create a viminfo anyway
-COMMAND="$COMMAND -i $HOME/vimproj/$PROJECT/viminfo"
+COMMAND="$COMMAND -i $PROJECT_LOC/viminfo"
+
+# This would export what ever data required by project!
+[ -f "$PROJECT_LOC/initrc" ] && source $PROJECT_LOC/initrc
 
 exec $COMMAND "$@"
