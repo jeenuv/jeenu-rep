@@ -1,6 +1,8 @@
 
-" Name of this project
-let s:this_project = $PROJECT_NAME
+if $PROJECT_LOC == ""
+    echohl Error | echo "$PROJECT_LOC is not set!" | echohl None
+    finish
+endif
 
 " Directory where this file lies
 let s:this_dir =  $PROJECT_LOC
@@ -8,12 +10,6 @@ let s:this_dir =  $PROJECT_LOC
 " Root directory for project files
 let s:root_dir = "/cygdrive/f/Symbian/M04820_Symbian_OS_v9.6/src/CEDAR/GENERIC/base"
 
-if exists("s:" . s:this_project)
-    echohl Error | echo "Project settings already loaded" | echohl None
-    finish
-endif
-
-exe "let s:" . s:this_project . " = 1"
 exe "set tags+=" . s:this_dir . "/" . "tags"
 
 set path=.
