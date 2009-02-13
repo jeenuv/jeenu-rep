@@ -1,46 +1,53 @@
 #!/bin/bash
 
 PROGNAME=$(basename $0)
-THISDIR=$(dirname $0)
-FILETYPES="*.c *.ic *.cpp *.h *.s"
-SRCDIRS="/home/jeenu/minix"
 
-TEMPFILE=${THISDIR}/files.list
-
-[ -z "$TEMPFILE" ] && exit
-
-## TAGS setup
-
-TAGFILENAME="${THISDIR}/tags"
-
-# Disable file name globbing
-set -f
-
-if [ ! -f "$TEMPFILE" ]; then
-    echo "$PROGNAME: creating list of files..."
-    for i in $FILETYPES; do
-        find $SRCDIRS -name $i >> $TEMPFILE
-    done
+if [ -z "$PROJECT_ROOT" ]; then
+    echo "$PROGNAME: \$PROJECT_ROOT is not set!"
 else
-    echo "$PROGNAME: using the existing \"$TEMPFILE\" (addition/deletion of files are not reflected)"
+    echo "$PROGNAME: using \$PROJECT_ROOT as $PROJECT_ROOT"
+fi
+
+THISDIR=$( (cd $(dirname $0) && pwd) )
+FIND_EXPR="( -iname *.cpp -o -iname *.h -o -iname *.inl -o -iname *.s -o -iname *.cia )"
+SRCDIRS="$PROJECT_ROOT/e32
+         $PROJECT_ROOT/bsp/hwip_arm"
+TEMPFILE=files.list
+
+if [ ! -d "$PROJECT_ROOT" ]; then
+    echo "$PROGNAME: directory $PROJECT_ROOT doesn't exist!"
+    exit 1
+fi
+
+cd "$THISDIR"
+
+if [ -f "$TEMPFILE" ]; then
+    read -p "$PROGNAME: delete and remake files.list (y/n)? "
+    if [ "$REPLY" = "y" -o "$REPLY" = "Y" ]; then
+        rm $TEMPFILE
+        echo "$PROGNAME: building list of files"
+        find $SRCDIRS -name .svn -prune -o $(echo $FIND_EXPR) -print > $TEMPFILE
+    fi
+else
+    echo "$PROGNAME: building list of files"
+    find $SRCDIRS -name .svn -prune -o $(echo $FIND_EXPR) -print > $TEMPFILE
 fi
 
 # Delete the tag file if already existing
 [ -f "$TAGFILENAME" ] && rm $TAGFILENAME
 
-# Build the C tags
-if ctags -f ${TAGFILENAME} --sort=no --c-types=+p -I _PROTOTYPE+ -L $TEMPFILE; then
+# --sort=no - tags in the C file gets a precedence
+if ctags -L $TEMPFILE --langmap=c++:+.inl,c++:+.cia; then
     echo $PROGNAME: tags built
 else
     echo $PROGNAME: error building tags
 fi
 
 ## CSCOPE setup
-rm -f cscope*
 
-CSCOPEFILENAME="${THISDIR}/cscope"
+CSCOPEFILENAME=cscope
 
-if cscope -bqk -i $TEMPFILE -f $CSCOPEFILENAME; then
+if mlcscope -b -q -k -i $TEMPFILE -f $CSCOPEFILENAME; then
     echo $PROGNAME: cscope db built
 else
     echo $PROGNAME: error building cs db
