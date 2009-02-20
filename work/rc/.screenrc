@@ -22,4 +22,4 @@ vbell off
 shell bash
 
 # define the number of lines to scroll back
-defscrollback 4000
+defscrollback 5000
