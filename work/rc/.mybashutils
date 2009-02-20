@@ -23,7 +23,7 @@ function bmread()
     fi
 
     # Check for templated file
-    if cat "$PROFILE_BM" | grep -q '\$TEMPLATE_BM'; then
+    if cat "$PROFILE_BM" | GREP_OPTIONS= grep -q '\$TEMPLATE_BM'; then
         # If it's templated, check for $TEMPLATE_BM
         bmtemplate
         if ! confirm "bmread: Are you sure you want to continue?"; then
@@ -64,7 +64,7 @@ function bm()
             CHANGED_BM=1
         fi
     else
-        if { echo "$1" | grep '^[0-9]' || echo "$1" | grep '[^0-9A-Za-z_]'; } > /dev/null; then
+        if { echo "$1" | GREP_OPTIONS= grep '^[0-9]' || echo "$1" | GREP_OPTIONS= grep '[^0-9A-Za-z_]'; } > /dev/null; then
             echo "bm: Invalid bookmark name"
             return
         fi
@@ -140,7 +140,7 @@ function bmwrite()
     if [ "$CHANGED_BM" -ne 0 ]; then
         echo "#BOOKMARK" > "$PROFILE_BM"
         set |
-        grep '^bm_' |
+        GREP_OPTIONS= grep '^bm_' |
         while read i; do
             if [ "$template" -eq 1 ]; then
                 i="$(echo "$i" | sed "s#$TEMPLATE_BM#\$TEMPLATE_BM#")"

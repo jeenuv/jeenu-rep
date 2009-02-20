@@ -29,7 +29,7 @@ alias H='head'
 alias G='grep'
 
 # This is supposed to be used after a '|' from shell
-alias Q="grep -v .svn/ > ~/tmp/errors && env -u DISPLAY vim -q ~/tmp/errors"
+alias Q="GREP_OPTIONS= grep -v .svn/ > ~/tmp/errors && env -u DISPLAY vim -q ~/tmp/errors"
 
 ###########################
 ####  Shell Variables  ####
@@ -46,6 +46,9 @@ export SVN_EDITOR='env -u DISPLAY vim "+set tw=100"'
 
 # Make the shell ignore the .svn when completing file/directory names
 export FIGNORE=".svn:.o:~"
+
+# Export some commonly used Grep options
+export GREP_OPTIONS="-nHI"
 
 # Create a tmp directory
 if [ ! -d ~/tmp ]; then
