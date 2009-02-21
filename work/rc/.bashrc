@@ -252,6 +252,15 @@ complete -c launch
 complete -F _launch_complete -o default launch
 complete -F _launch_complete -o default sudo
 
+# Set colors for 'ls'
+[ "$TERM" != "dump" ] && eval "$(dircolors -b)"
+
+# I don't want alias expansions to happen when sourcing other utilities
+if shopt expand_aliases &>/dev/null; then
+    shopt -u expand_aliases
+    shell_aliases_disabled=yes
+fi
+
 # Bookmarking features
 [ -f "$HOME/.mybashutils" ] && source "$HOME/.mybashutils"
 # read all bookmarks
@@ -266,3 +275,9 @@ bmprofile "$HOME/.book"
 # Source system dependent file if any.
 # This, preferably, should be the last line in this file
 [ -f "$HOME/.bashrc.local" ] && source "$HOME/.bashrc.local"
+
+# Restore the shell aliasing setting
+if [ "$shell_aliases_disabled" = "yes" ]; then
+    shopt -s expand_aliases
+    unset shell_aliases_disabled
+fi
