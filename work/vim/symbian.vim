@@ -24,10 +24,10 @@ execute "setl softtabstop=" . &tabstop
 set nolist
 
 " Mappings for function browsing
-nnoremap <silent> <buffer> ]] :call <SID>SymbianJump('/^\t{')<CR>
-nnoremap <silent> <buffer> ][ :call <SID>SymbianJump('/^\t}')<CR>
-nnoremap <silent> <buffer> [[ :call <SID>SymbianJump('?^\t{')<CR>
-nnoremap <silent> <buffer> [] :call <SID>SymbianJump('?^\t}')<CR>
+nnoremap <silent> <buffer> g]] :call <SID>SymbianJump('/^\t{')<CR>
+nnoremap <silent> <buffer> g][ :call <SID>SymbianJump('/^\t}')<CR>
+nnoremap <silent> <buffer> g[[ :call <SID>SymbianJump('?^\t{')<CR>
+nnoremap <silent> <buffer> g[] :call <SID>SymbianJump('?^\t}')<CR>
 
 fun! <SID>SymbianJump(motion) range
     let cnt = v:count1
