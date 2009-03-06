@@ -567,14 +567,11 @@ function! AlignVert(direction) range
     let l:cur_end   = getpos("'>")
 
     " Sanity checks. We've to consider the offset since 've' is set
-    if l:cur_start[1] == 0 ||
-                \ l:cur_start[2] == 0 ||
-                \ l:cur_end[1] == 0 ||
-                \ l:cur_end[2] == 0
+    if    l:cur_start[1] == 0 ||
+        \ l:cur_start[2] == 0 ||
+        \ l:cur_end[1] == 0   ||
+        \ l:cur_end[2] == 0
         echo "No visual selection made"
-        return
-    elseif (l:cur_start[2] + l:cur_start[3]) != (l:cur_end[2] + l:cur_end[3])
-        echo "You've to make a single-column vertical selection"
         return
     endif
 
