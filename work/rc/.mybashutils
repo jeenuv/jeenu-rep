@@ -115,7 +115,11 @@ function bms()
 {
     local i
 
-    [ "$#" -ne 0 ] && { echo "bms: No arguments accepted"; return; }
+    if [ "$#" -ne 0 ];
+        echo "bms: No arguments accepted"
+        return
+    fi
+
     printf "%-20s %s\n%-20s %s\n" Bookmark Location ========== ==========
     for i in ${!bm_*}; do
         printf "%-20s %s\n" ${i#bm_} $(eval "echo \$$i")
@@ -222,7 +226,6 @@ function bmtemplate()
         echo "bmtemplate: Template set to $TEMPLATE_BM"
     fi
 
-    CHANGED_BM=1
     return 0
 }
 
