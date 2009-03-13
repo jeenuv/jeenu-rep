@@ -1,10 +1,10 @@
 #!/bin/bash
 
 _Svn_Command='add blame cat checkout co cleanup commit ci copy cp delete remove rm diff export help ? import info list ls lock log
-merge mkdir move mv rename propdel pd propedit pedit pe propget pget pg proplist plist pl propset pset ps resolved revert status
+merge mergeinfo mkdir move mv rename propdel pd propedit pedit pe propget pget pg proplist plist pl propset pset ps resolved revert status
 switch unlock update --version'
 
-_Svn_Options='--stop-on-copy --config-dir --dry-run --recursive --limit --no-ignore --ignore-eol-style'
+_Svn_Options='--stop-on-copy --config-dir --dry-run --recursive --limit --no-ignore --ignore-eol-style --ignore-ancestry --diff-cmd'
 
 # Remove ':' as we need it for URL completion
 COMP_WORDBREAKS=${COMP_WORDBREAKS//:}
