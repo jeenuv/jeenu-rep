@@ -122,7 +122,7 @@ function bms()
 
     printf "%-20s %s\n%-20s %s\n" Bookmark Location ========== ==========
     for i in ${!bm_*}; do
-        printf "%-20s %s\n" "${i#bm_}" "$(eval "echo \$$i")"
+        eval "printf \"%-20s%-20s\\n\" ${i/bm_/} \$$i"
     done
 }
 
