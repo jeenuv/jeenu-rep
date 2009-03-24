@@ -45,7 +45,7 @@ export EDITOR='env -u DISPLAY vim'
 export SVN_EDITOR='env -u DISPLAY vim "+set tw=100"'
 
 # Make the shell ignore the .svn when completing file/directory names
-export FIGNORE=".svn:.o:~"
+export FIGNORE=".svn:.git:.o:~"
 
 # Export some commonly used Grep options
 export GREP_OPTIONS="-nHI"
@@ -85,7 +85,7 @@ function confirm()
         return 1
     fi
 
-    echo -n "$1 (y/n) "
+    echo -n "${PROGNAME+$PROGNAME: }$1 (y/n) "
     read
     if [ "$REPLY" = "y" -o "$REPLY" = "Y" ]; then
         return 0
