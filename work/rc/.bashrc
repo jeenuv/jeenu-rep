@@ -266,8 +266,15 @@ fi
 # read all bookmarks
 bmprofile "$HOME/.book"
 
-# Get SVN utilities
+# Get SVN completion
+if [ -f /etc/bash_completion.d/svn ]; then
+    source /etc/bash_completion.d/svn
+    svn_sourced=1
+fi
+
+# My own SVN utilities
 [ -f "$HOME/.mysvnutils" ] && source "$HOME/.mysvnutils"
+unset svn_sourced
 
 # Set colors for 'ls'
 [ "$TERM" != "dump" ] && eval "$(dircolors -b)"
