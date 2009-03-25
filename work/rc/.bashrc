@@ -269,7 +269,7 @@ bmprofile "$HOME/.book"
 # Get SVN completion
 if [ -f /etc/bash_completion.d/svn ]; then
     source /etc/bash_completion.d/svn
-    svn_sourced=1
+    svn_sourced=yes
 fi
 
 # My own SVN utilities

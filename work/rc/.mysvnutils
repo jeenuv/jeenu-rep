@@ -45,7 +45,7 @@ function svngetreproot()
 }
 
 # If SVN completion hasn't been sourced yet
-if [ "$svn_sourced" -ne 1 ]; then
+if [ -z "$svn_sourced" ]; then
     _Svn_Command='add blame cat checkout co cleanup commit ci copy cp delete remove rm diff export help ? import info list ls lock log
     merge mergeinfo mkdir move mv rename propdel pd propedit pedit pe propget pget pg proplist plist pl propset pset ps resolved revert status
     switch unlock update --version'
