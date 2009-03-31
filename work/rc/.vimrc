@@ -441,7 +441,7 @@ function! PrepareSVNCommit()
     set tw=80                          " Set text width to 80
     set ft=sh|                         " Set sh filetype for clarity
     normal isvn ci
-    silent r !svn st
+    silent r !svn st -q
     2,$yank a                                 " Yank the svn st output to register a
     silent g/^[?~]/delete                     " Delete the unversioned items from commit list
     silent 2,$g/.*/normal 6x/                 " Delete all the flags infront of files
@@ -451,7 +451,7 @@ function! PrepareSVNCommit()
 
     " For the sake of clarity, just put the actual output of svn st at
     " the bottom in comments
-    execute "normal o# -- This was the unfiltered output of 'svn st' --"
+    execute "normal o# -- This was the unfiltered output of 'svn st -q' --"
     " Now comment out all the svn st output
     silent put a
     normal '[
