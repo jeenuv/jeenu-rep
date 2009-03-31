@@ -10,7 +10,7 @@ PROFILE_BM="$HOME/.book"
 function bmread()
 {
     if [ "$CHANGED_BM" -ne 0 ]; then
-        echo "bmread: There are new bookmarks. Identical bookmarks will be overwritten when reading."
+        echo "bmread: There are new bookmarks. Unsaved bookmarks will be overwritten when reading."
         if ! confirm "You want to continue?"; then
             return 1
         fi
