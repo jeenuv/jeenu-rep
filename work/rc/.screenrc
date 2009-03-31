@@ -23,3 +23,4 @@ shell bash
 
 # define the number of lines to scroll back
 defscrollback 5000
+ignorecase on
