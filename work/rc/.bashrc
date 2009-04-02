@@ -50,6 +50,9 @@ export FIGNORE=".svn:.git:.o:~"
 # Export some commonly used Grep options
 export GREP_OPTIONS="-nHI"
 
+# Set history size to a larger value
+export HISTSIZE=1000
+
 # Create a tmp directory
 if [ ! -d ~/tmp ]; then
     mkdir ~/tmp
