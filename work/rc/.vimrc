@@ -120,6 +120,12 @@ if has("gui_running")
     " I don't want tool and menu bars!
     set guioptions-=m
     set guioptions-=T
+
+    " I don't want any scroll bars either
+    set guioptions-=r
+    set guioptions-=R
+    set guioptions-=l
+    set guioptions-=L
 else
     " Currently selected colorscheme; doesn't look bad
     colorscheme desert
