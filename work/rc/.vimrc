@@ -126,6 +126,10 @@ if has("gui_running")
     set guioptions-=R
     set guioptions-=l
     set guioptions-=L
+
+    " Set the default height of GVim window
+    set lines=35
+    set columns=90
 else
     " Currently selected colorscheme; doesn't look bad
     colorscheme desert
