@@ -1,0 +1,48 @@
+#!/bin/bash
+
+PROGNAME="$(basename $0)"
+USAGE="Usage: tarcp ARGS -d DEST [-t]"
+
+if ! which getopt >/dev/null; then
+    echo "$PROGNAME: getopt not found in \$PATH"
+    exit 1
+fi
+
+eval set -- $(getopt -o "d:" -q -- "$@")
+if [ "$?" -ne 0 -a "$?" -ne 1 ]; then
+    echo "$PROGNAME: 'getopt' returned error"
+    exit 1
+fi
+
+set -x
+until [ -z "$*" ]; do
+    case "$1" in
+        -d)
+        shift
+        DEST="$1"
+        ;;
+
+        --)
+        shift
+        set -- "$@"
+        break
+        ;;
+    esac
+
+    shift
+done
+
+if [ "$#" -eq 0 ]; then
+    echo "$PROGNAME: Not enough arguments"
+    echo "$USAGE"
+    exit 1
+fi
+
+if [ -z "$DEST" ]; then
+    echo "$PROGNAME: No destination specified with -d"
+    echo "$USAGE"
+    exit 1
+fi
+
+echo "$PROGNAME: $@ => $DEST"
+tar cz "$@" | tar xz -C "$DEST"
