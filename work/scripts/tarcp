@@ -1,25 +1,25 @@
 #!/bin/bash
 
 PROGNAME="$(basename $0)"
-USAGE="Usage: tarcp ARGS -d DEST [-t]"
+USAGE="Usage: tarcp ARGS [-v]"
 
 if ! which getopt >/dev/null; then
     echo "$PROGNAME: getopt not found in \$PATH"
     exit 1
 fi
 
-eval set -- $(getopt -o "d:" -q -- "$@")
-if [ "$?" -ne 0 -a "$?" -ne 1 ]; then
+ARGS="$(getopt -o "v" -- "$@")"
+if [ "$?" -ne 0 ]; then
     echo "$PROGNAME: 'getopt' returned error"
     exit 1
+else
+    eval set -- $ARGS
 fi
 
-set -x
 until [ -z "$*" ]; do
     case "$1" in
-        -d)
-        shift
-        DEST="$1"
+        -v)
+        VERBOSE=v
         ;;
 
         --)
@@ -32,17 +32,24 @@ until [ -z "$*" ]; do
     shift
 done
 
-if [ "$#" -eq 0 ]; then
+ARGS=("$@")
+
+if [ "${#ARGS[*]}" -lt 2 ]; then
     echo "$PROGNAME: Not enough arguments"
     echo "$USAGE"
     exit 1
 fi
 
-if [ -z "$DEST" ]; then
-    echo "$PROGNAME: No destination specified with -d"
-    echo "$USAGE"
+DEST="${ARGS[$#-1]}"
+
+if [ ! -e "$DEST" ]; then
+    echo "$PROGNAME: Destination $DEST doesn't exist"
+    exit 1
+elif [ ! -d "$DEST" ]; then
+    echo "$PROGNAME: Destination $DEST is not a directory"
     exit 1
 fi
 
-echo "$PROGNAME: $@ => $DEST"
-tar cz "$@" | tar xz -C "$DEST"
+unset ARGS[$#-1]
+
+tar cz$VERBOSE "${ARGS[@]}" | tar xz -C "$DEST"
