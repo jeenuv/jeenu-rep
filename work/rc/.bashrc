@@ -178,7 +178,7 @@ function rm()
     fi
 
     until [ -z "$*" ]; do
-        case $1 in
+        case "$1" in
             -r | -R | --recursive)
             recursive=1
             ;;
@@ -198,7 +198,8 @@ function rm()
     if [ "$recursive" -eq 1 ]; then
         local mark="$(uuidgen | awk -F- '{print toupper($2)}')"
         echo "rm: To proceed, enter the following text below: $mark"
-        echo -n "** $arguments **: " && read
+        echo -n "** $arguments **: "
+        read
         if [ "$REPLY" != "$mark" ]; then
             echo "rm: Command aborted"
             echo "$must"
