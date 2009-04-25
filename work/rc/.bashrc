@@ -19,9 +19,9 @@ alias vi='env -u DISPLAY vim -n'
 alias grep='grep --color'
 alias dirs='dirs -v'
 alias bell='echo -ne "\a"'
-alias cp='cp -i'
-alias mv='mv -i'
-alias rm='rm -i'
+alias cp='cp -iv'
+alias mv='mv -iv'
+alias rm='rm -iv'
 alias L='less -iRS'
 alias V='env -u DISPLAY vim -nR -'
 alias T='tail'
@@ -254,7 +254,6 @@ complete -c man
 complete -c launch
 
 complete -F _launch_complete -o default launch
-complete -F _launch_complete -o default sudo
 
 # Set colors for 'ls'
 [ "$TERM" != "dump" ] && eval "$(dircolors -b)"
