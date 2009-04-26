@@ -223,6 +223,11 @@ function _vimproj_complete()
     COMPREPLY=()
     CUR=${COMP_WORDS[$COMP_CWORD]}
 
+    # We don't have anything to complete if directory itself isn't there!
+    if [ ! -d ~/vimproj ]; then
+        return
+    fi
+
     if [ "$COMP_CWORD" -eq 1 ]; then
         # Only directories and get rid of the '.' entry
         projects=$(find ~/vimproj -type d -printf "%f\n" | sed '1d')
