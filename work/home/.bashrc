@@ -148,7 +148,7 @@ function playall()
 function rm()
 {
     local actual_rm="$(which rm)"
-    local must="rm: Thou shalt invoke $actual_rm explicitly"
+    local must="rm: Thou shalt invoke $actual_rm directly"
     local recursive=0
 
     if ! which getopt >/dev/null; then
