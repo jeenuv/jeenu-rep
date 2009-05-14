@@ -82,8 +82,7 @@ syn match armLogicKeyword       "\<NOP\>"
 syn match armCompareKeyword     "\<CMP\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\>" contains=armConditional
 syn match armCompareKeyword     "\<CMN\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\>" contains=armConditional
 
-syn match armBranchKeyword      "\<B\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\>" contains=armConditional
-syn match armBranchKeyword      "\<BL\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\>" contains=armConditional
+syn match armBranchKeyword      "\<BL\?X\?\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\>" contains=armConditional
 
 syn match armLoadKeyword        "\<LDR\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|b\|sb\|h\|sh\)\>" contains=armConditional,armLenModif
 syn match armLoadMKeyword       "\<LDM\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(IA\|IB\|DA\|DB\|FD\|ED\|FA\|EA\)\>" contains=armConditional,armStack
