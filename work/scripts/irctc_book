@@ -7,5 +7,19 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
+if ! echo "$1" | awk -F- '{
+    if (NF != 3) {
+        exit 1
+    } else if (length($1) != 4) {
+        exit 1
+    } else if ((length($2) != 2) && (length($3) != 2)) {
+        exit 1
+    }
+    exit 0
+}'; then
+    echo "$USAGE"
+    exit 1
+fi
+
 GIVEN_DATE=$(date -d "$1") || exit
 date -d "$GIVEN_DATE - 90 days" +%F
