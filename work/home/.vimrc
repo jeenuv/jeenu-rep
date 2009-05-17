@@ -428,18 +428,25 @@ endfunction
 function! GetWrapperChoiceFromUser() range
     let l:charmap = { "(" : ")", "{" : "}", "[" : "]", "<" : ">" }
     let l:choice = input("Enter a string to wrap: ")
+    let l:length = len(l:choice)
+    let l:pair = ""
+    let l:index = 0
 
-    " Try getting the pair
-    try
-        let l:pair = l:charmap[l:choice]
-    catch /E716/
-        " If it doens't have a pair, use the choice itself
-        let l:pair = l:choice
-    catch /E713/
-        " Either entered nothing, or pressed <ESC>
-        normal `<
-        return
-    endtry
+    while l:index < l:length
+        " Try getting the pair
+        try
+            let l:pair = l:pair . l:charmap[l:choice[l:index]]
+        catch /E716/
+            " If it doens't have a pair, use the choice itself
+            let l:pair = l:pair . l:choice[l:index]
+        catch /E713/
+            " Either entered nothing, or pressed <ESC>
+            normal `<
+            return
+        endtry
+
+        let l:index = l:index + 1
+    endwhile
 
     " Now wrap the selection with the selected character and it's pair
     execute "normal `>a" . l:pair . "\<ESC>`<i" . l:choice . "\<ESC>"
