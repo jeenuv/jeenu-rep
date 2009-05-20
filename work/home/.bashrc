@@ -212,6 +212,29 @@ function rm()
     fi
 }
 
+# Function to wait until a PID or an input pattern disappears from the list
+# of processes. I.e. they are termiated. This would come in handy to queue another
+# process, say, another download, only after the current one is finished.
+#
+# The command to get the list of processes is first obtained from $PS_COMMAND, if set.
+# This is particularly useful in Cygwin, where -W, a non standard option, is needed to
+# view Windows processes
+function waitfor()
+{
+    local pat
+    local ps_command="${PS_COMMAND:-ps aux}"
+
+    if [ -z "$1" ]; then
+        return 1
+    fi
+
+    # Convert, say, wget to [w]get
+    pat="$(echo "$1" | sed 's/./[&]/')"
+    while $ps_command | grep -q "$pat"; do
+        sleep 10
+    done
+}
+
 ############################
 ### Completion functions ###
 ############################
