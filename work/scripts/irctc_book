@@ -12,7 +12,7 @@ if ! echo "$1" | awk -F- '{
         exit 1
     } else if (length($1) != 4) {
         exit 1
-    } else if ((length($2) != 2) && (length($3) != 2)) {
+    } else if ((length($2) != 2) || (length($3) != 2)) {
         exit 1
     }
     exit 0
