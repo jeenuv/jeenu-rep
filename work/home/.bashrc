@@ -47,11 +47,11 @@ export SVN_EDITOR='env -u DISPLAY vim "+set tw=100"'
 # Make the shell ignore the .svn when completing file/directory names
 export FIGNORE=".svn:.git:.o:~"
 
-# Export some commonly used Grep options
-export GREP_OPTIONS='-nHI --exclude=\*.svn-base'
-
 # Set history size to a larger value
 export HISTSIZE=1000
+
+# Some commonly used Grep options
+GREP_OPTIONS='-nHI --exclude=\*.svn-base'
 
 # Create a tmp directory
 if [ ! -d ~/tmp ]; then
