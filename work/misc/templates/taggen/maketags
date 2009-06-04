@@ -1,65 +1,83 @@
 #!/bin/bash
 
+function script_echo()
+{
+    echo "$PROGNAME: $@"
+}
+
+function buildfiles()
+{
+
+    if [ -f "$2" ]; then
+        read -p "$PROGNAME: delete and remake $2 (y/n)? "
+        if [ "$REPLY" = "y" -o "$REPLY" = "Y" ]; then
+            rm "$2"
+            script_echo "building list of files"
+            find $1 -name .svn -prune -o $(echo $FIND_EXPR) -print > "$2"
+        fi
+    else
+        script_echo "building list of files"
+        find $1 -name .svn -prune -o $(echo $FIND_EXPR) -print > "$2"
+    fi
+}
+
 PROGNAME=$(basename $0)
 THISDIR=$( (cd $(dirname $0) && pwd) )
+TAGLIST=files.ctags.list
+CSCOPELIST=files.cscope.list
 
 cd "$THISDIR"
 
 [ -f initrc ] && source initrc
 
 if [ -z "$PROJECT_ROOT" ]; then
-    echo "$PROGNAME: \$PROJECT_ROOT is not set!"
+    script_echo "\$PROJECT_ROOT is not set!"
 else
-    echo "$PROGNAME: using \$PROJECT_ROOT as $PROJECT_ROOT"
+    script_echo "using \$PROJECT_ROOT as $PROJECT_ROOT"
 fi
 
-FIND_EXPR="( -iname *.cpp -o -iname *.h -o -iname *.inl -o -iname *.s -o -iname *.cia )"
-SRCDIRS="$PROJECT_ROOT/e32
+FIND_EXPR="( -iname *.cpp -o -iname *.h -o -iname *.inl -o -iname *.s -o -iname *.cia -o -iname *.inc )"
+TAGDIRS="$PROJECT_ROOT/e32
          $PROJECT_ROOT/f32
          $PROJECT_ROOT/bsp/hwip_arm"
-TEMPFILE=files.list
+CSCOPEDIRS="$PROJECT_ROOT/e32
+            $PROJECT_ROOT/f32
+            $PROJECT_ROOT/bsp/hwip_arm"
 
 if [ ! -d "$PROJECT_ROOT" ]; then
-    echo "$PROGNAME: directory $PROJECT_ROOT doesn't exist!"
+    script_echo "directory $PROJECT_ROOT doesn't exist!"
     exit 1
 fi
 
-if [ -f "$TEMPFILE" ]; then
-    read -p "$PROGNAME: delete and remake files.list (y/n)? "
-    if [ "$REPLY" = "y" -o "$REPLY" = "Y" ]; then
-        rm $TEMPFILE
-        echo "$PROGNAME: building list of files"
-        find $SRCDIRS -name .svn -prune -o $(echo $FIND_EXPR) -print > $TEMPFILE
+if confirm "build tags"; then
+    buildfiles "$TAGDIRS" "$TAGLIST"
+
+    # Delete the tag file if already existing
+    [ -f "$TAGFILENAME" ] && rm $TAGFILENAME
+
+    script_echo "building tags"
+    if ctags -L $TAGLIST \
+            --langmap=c++:+.inl,c++:+.cia,asm:+.inc \
+            --extra=+f \
+            --extra=+q \
+            -I __FALCON__ \
+            -I NONSHARABLE_CLASS=class\
+            -I EXPORT_C \
+            -I IMPORT_C; then
+        script_echo "tags built"
+    else
+        script_echo "error building tags"
     fi
-else
-    echo "$PROGNAME: building list of files"
-    find $SRCDIRS -name .svn -prune -o $(echo $FIND_EXPR) -print > $TEMPFILE
-fi
-
-# Delete the tag file if already existing
-[ -f "$TAGFILENAME" ] && rm $TAGFILENAME
-
-echo "$PROGNAME: building tags"
-# --sort=no - tags in the C file gets a precedence
-if ctags -L $TEMPFILE \
-        --langmap=c++:+.inl,c++:+.cia \
-        --extra=+f \
-        --extra=+q \
-        -I __FALCON__ \
-        -I NONSHARABLE_CLASS=class\
-        -I EXPORT_C \
-        -I IMPORT_C; then
-    echo $PROGNAME: tags built
-else
-    echo $PROGNAME: error building tags
 fi
 
 ## CSCOPE setup
 
-CSCOPEFILENAME=cscope
+if confirm "build cscope"; then
+    buildfiles "$CSCOPEDIRS" "$CSCOPELIST"
 
-if mlcscope -b -q -k -i $TEMPFILE -f $CSCOPEFILENAME; then
-    echo $PROGNAME: cscope db built
-else
-    echo $PROGNAME: error building cs db
+    if mlcscope -b -q -k -i "$CSCOPELIST" -f cscope; then
+        script_echo "cscope db built"
+    else
+        script_echo "error building cs db"
+    fi
 fi

@@ -34,4 +34,5 @@ else
 endif
 
 au BufRead,BufNew *.cia setf cpp
-au BufRead,BufNew *.cpp,*.h,*.inl,*.cia source ~/jeenu-rep/work/vim/jeenu/symbian.vim
+au BufRead,BufNew *.cpp,*.h,*.inl,*.cia source ~/jeenu-rep/work/vim/symbian.vim
+au BufRead,BufNew *.s,*.inc set ft=arm_asm
