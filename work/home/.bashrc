@@ -52,7 +52,7 @@ HISTSIZE=1000
 
 # Histroy control
 HISTCONTROL=ignorespace:ignoredups:erasedups
-HISTIGNORE='mplayer *:m *'
+HISTIGNORE='mplayer*'
 
 # Some commonly used Grep options
 GREP_OPTIONS='-nHI --exclude=\*.svn-base'
