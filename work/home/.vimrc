@@ -322,8 +322,8 @@ function TabsToSpace()
 
         " Get the correct number of spaces to substitute
         while l:Index < &shiftwidth
-            let l:Subs = (l:Subs . " ")
-            let l:Index = l:Index + 1
+            let l:Subs .= " "
+            let l:Index += 1
         endwhile
     endif
 
@@ -435,10 +435,10 @@ function! GetWrapperChoiceFromUser() range
     while l:index < l:length
         " Try getting the pair
         try
-            let l:pair = l:pair . l:charmap[l:choice[l:index]]
+            let l:pair .= l:charmap[l:choice[l:index]]
         catch /E716/
             " If it doens't have a pair, use the choice itself
-            let l:pair = l:pair . l:choice[l:index]
+            let l:pair .= l:choice[l:index]
         catch /E713/
             " Either entered nothing, or pressed <ESC>
             normal `<
@@ -510,14 +510,14 @@ function! DoHighlight(...)
 
     let l:pattern = ""
     while l:i < l:num_items
-        let l:pattern = l:pattern . w:J_highlighting[l:i]
+        let l:pattern .= w:J_highlighting[l:i]
 
         " Append a \|, but for the last element in the list
         if l:i < (l:num_items - 1)
-            let l:pattern = l:pattern . "\\|"
+            let l:pattern .= "\\|"
         endif
 
-        let l:i = l:i + 1
+        let l:i += 1
     endwhile
 
     " Finally run the match command
@@ -646,7 +646,7 @@ function! InsertTimestamp(count) range
         " This will insert the timestamp onto a new line; hence we've to join lines
         execute "r !uuidgen | awk -F- '{printf $NF}'"
 
-        let l:count = l:count -1
+        let l:count -= 1
     endwhile
 
     if a:count == 1
