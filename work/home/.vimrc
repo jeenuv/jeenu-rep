@@ -133,6 +133,11 @@ if has("gui_running")
     " Set the default height of GVim window
     set lines=35
     set columns=90
+
+    " Set GUI tab label. This has got similar, but different usage than
+    " 'tabline'. See help for details
+    " 7d0ec10437cd
+    set guitablabel=%!GetTabFileName(tabpagenr())
 else
     " Currently selected colorscheme; doesn't look bad
     colorscheme desert
@@ -708,7 +713,8 @@ function MakeTabLine()
 endfunction
 
 " Function which creates a title strength for a single tab page. This is invoked
-" by MakeTabLine() See: 9ea3b718f344
+" by MakeTabLine() S(ee: 9ea3b718f344) and used in setting GUI tab label
+" (See: 7d0ec10437cd)
 function GetTabFileName(n)
     " List of buffers in the tab
     let l:buf_list = tabpagebuflist(a:n)
