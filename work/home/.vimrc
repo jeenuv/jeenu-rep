@@ -75,6 +75,9 @@ set wildmenu
 " This set so that I can run :ru jeenu/some.vim so that I get my desired settings
 set runtimepath+=~/.vim
 
+" Make tab lines in my way!
+set tabline=%!MakeTabLine()
+
 " If running under Cygwin, we need to add \ to file name characters
 if $PATH =~? "/cygdrive"
     set isf+=\\
@@ -670,6 +673,61 @@ function DoSVNPatch()
     call system("patch --binary -Ro " . escape(v:fname_out, ' \') . " " . escape(v:fname_in, ' \') . " < " .  escape(v:fname_diff, ' \'))
 endfunction
 
+" Function to make the tab line. Most of this is picked from the sample
+" given in the doc. Changes that I made different from the default
+" behavior are:
+" * Tab page has the tab numbers instead of the no. of widows open
+" * Tab title only shows the base name of the file, and this would
+"   save space, and is more readable
+function MakeTabLine()
+    let l:tab_line = ''
+    for l:i in range(tabpagenr('$'))
+        " select the highlighting
+        if l:i + 1 == tabpagenr()
+            let l:tab_line .= '%#TabLineSel#'
+        else
+            let l:tab_line .= '%#TabLine#'
+        endif
+
+        " set the tab page number (for mouse clicks)
+        let l:tab_line .= '%' . (l:i + 1) . 'T'
+
+        " the label is made by MyTabLabel()
+        let l:tab_line .= GetTabFileName(l:i + 1) " 9ea3b718f344
+    endfor
+
+    " after the last tab fill with TabLineFill and reset tab page nr
+    let l:tab_line .= '%#TabLineFill#%T'
+
+    " right-align the label to close the current tab page
+    if tabpagenr('$') > 1
+        let l:tab_line .= '%=%#TabLine#%999Xclose'
+    endif
+
+    return l:tab_line
+endfunction
+
+" Function which creates a title strength for a single tab page. This is invoked
+" by MakeTabLine() See: 9ea3b718f344
+function GetTabFileName(n)
+    " List of buffers in the tab
+    let l:buf_list = tabpagebuflist(a:n)
+    " The active window in the tab
+    let l:win_in_tab = tabpagewinnr(a:n)
+    " Buffer number contained in the active window
+    let l:buffer_number = l:buf_list[l:win_in_tab - 1]
+    " Get the basename of name of the file loaded in the buffer
+    let l:buffer_name = fnamemodify(bufname(l:buffer_number), ":t")
+
+    " Start with the tab number
+    let l:prefix = " " . a:n . " "
+
+    if getbufvar(l:buffer_number, "&modified") == 1
+        let l:prefix .= "+ "
+    endif
+
+    return l:prefix . l:buffer_name . " "
+endfunction
 " ****************************************************
 " ***************** END FUNCTIONS ********************
 " ****************************************************
