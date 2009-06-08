@@ -490,7 +490,7 @@ endfunction
 function! OnGUIEnter()
     set t_vb=
     nmap <C-?> :execute "tabnext " . g:J_old_tab<CR>
-endfu
+endfunction
 
 " Function to do highlighting. This adds pattern to the highlighting array
 function! DoHighlight(...)
@@ -534,7 +534,7 @@ function! DoHighlight(...)
     else
         execute "match Todo /" . pattern . "/"
     endif
-endfu
+endfunction
 
 " Function to undo highlighting. Uses the w:J_highlighting global varible
 function! UndoHighlight()
@@ -576,7 +576,7 @@ function! UndoHighlight()
             call DoHighlight()
         endif
     endif
-endfu
+endfunction
 
 " Function to alingn lines -- either left or right -- to a vertical line; just like a magnet.
 function! AlignVert(direction) range
@@ -637,7 +637,7 @@ function! AlignVert(direction) range
         call setpos("'b", save_b)
         call setpos("'c", save_c)
     endif
-endfu
+endfunction
 
 " Function to insert a (possibly) unique time stamp. This can be used to refer to other locations in
 " the code obviating the need for line-no. and similar references
@@ -666,7 +666,7 @@ function! InsertTimestamp(count) range
         " We just inserted the last timestamp; now move to where we were
         call setpos(".", cursor_pos)
     endif
-endfu
+endfunction
 
 " To generage patch for SVN. This is used in SVNBaseDiff command as well as
 " showbasediff shell script too. The --binary option was added for DOS files.
