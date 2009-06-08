@@ -726,7 +726,7 @@ function GetTabFileName(n)
     let buffer_name = fnamemodify(bufname(buffer_number), ":t")
 
     " Start with the tab number
-    let prefix = " " . a:n . " "
+    let prefix = " [" . a:n . "] "
 
     if getbufvar(buffer_number, "&modified") == 1
         let prefix .= "+ "
