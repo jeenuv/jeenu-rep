@@ -322,21 +322,21 @@ endif
 function TabsToSpace()
     if v:version >= 700
         " Use the repeat function for later versions of vim
-        let l:Subs = repeat(" ", &shiftwidth)
+        let subs = repeat(" ", &shiftwidth)
     else
         " Else simulate repeat() function
-        let l:Subs = ""
-        let l:Index = 0
+        let subs = ""
+        let index = 0
 
         " Get the correct number of spaces to substitute
-        while l:Index < &shiftwidth
-            let l:Subs .= " "
-            let l:Index += 1
+        while index < &shiftwidth
+            let subs .= " "
+            let index += 1
         endwhile
     endif
 
-    let l:Command = "%s/\\t/" . l:Subs . "/gce"
-    execute l:Command
+    let command = "%s/\\t/" . subs . "/gce"
+    execute command
     echo "Tabs converted to " . &shiftwidth . " spaces!"
 endfunction
 
@@ -357,18 +357,18 @@ endfunction
 " Obtain what the user want to do when C-N and C-P are pressed
 function! GetNPNavigatonChoiceFromUser(...)
     if a:0 == 0 || a:1 == ""
-        let l:choice = input("Enter a choice (p/t/c/l/d/a/g): ")
+        let choice = input("Enter a choice (p/t/c/l/d/a/g): ")
     else
-        let l:choice = a:1
+        let choice = a:1
     endif
 
-    if l:choice ==? "p" || l:choice == 1
+    if choice ==? "p" || choice == 1
         nmap <C-N> <C-F>
         nmap <C-P> <C-B>
 
         silent! nunmap g<C-N>
         silent! nunmap g<C-P>
-    elseif l:choice ==? "t" || l:choice == 2
+    elseif choice ==? "t" || choice == 2
         if v:version >= 700
             " Tab's were added after 700
             " tabnext does't accept a count, I've to work this around
@@ -386,42 +386,42 @@ function! GetNPNavigatonChoiceFromUser(...)
 
         silent! nunmap g<C-N>
         silent! nunmap g<C-P>
-    elseif l:choice ==? "c" || l:choice == 3
+    elseif choice ==? "c" || choice == 3
         " Navigate error list
         nmap <C-N> :<C-U>execute "keepju " . v:count . "cnext"<CR>
         nmap <C-P> :<C-U>execute "keepju " . v:count . "cprevious"<CR>
 
         nmap g<C-N> :<C-U>execute v:count . "cnewer"<CR>
         nmap g<C-P> :<C-U>execute v:count . "colder"<CR>
-    elseif l:choice ==? "l" || l:choice == 4
+    elseif choice ==? "l" || choice == 4
         " Navigate location list
         nmap <C-N> :<C-U>execute "keepju " . v:count . "lnext"<CR>
         nmap <C-P> :<C-U>execute "keepju " . v:count . "lprevious"<CR>
 
         nmap g<C-N> :<C-U>execute v:count . "lnewer"<CR>
         nmap g<C-P> :<C-U>execute v:count . "lolder"<CR>
-    elseif l:choice ==? "d" || l:choice == 5
+    elseif choice ==? "d" || choice == 5
         " Navigate diffs in file
         nmap <C-N> ]c
         nmap <C-P> [c
 
         silent! nunmap g<C-N>
         silent! nunmap g<C-P>
-    elseif l:choice ==? "a" || l:choice == 6
+    elseif choice ==? "a" || choice == 6
         " Navigate arguments
         nmap <C-N> :next<CR>
         nmap <C-P> :previous<CR>
 
         silent! nunmap g<C-N>
         silent! nunmap g<C-P>
-    elseif l:choice ==? "g" || l:choice == 7
+    elseif choice ==? "g" || choice == 7
         " Navigate tags
         nmap <C-N> :tn<CR>
         nmap <C-P> :tp<CR>
 
         silent! nunmap g<C-N>
         silent! nunmap g<C-P>
-    elseif l:choice == ""
+    elseif choice == ""
         return
     else
         echohl Error
@@ -434,30 +434,30 @@ endfunction
 " Function to obtain a character from user, when the he decides to wrap
 " the selection with (,{,[,",' etc.
 function! GetWrapperChoiceFromUser() range
-    let l:charmap = { "(" : ")", "{" : "}", "[" : "]", "<" : ">" }
-    let l:choice = input("Enter a string to wrap: ")
-    let l:length = len(l:choice)
-    let l:pair = ""
-    let l:index = 0
+    let charmap = { "(" : ")", "{" : "}", "[" : "]", "<" : ">" }
+    let choice = input("Enter a string to wrap: ")
+    let length = len(choice)
+    let pair = ""
+    let index = 0
 
-    while l:index < l:length
+    while index < length
         " Try getting the pair
         try
-            let l:pair .= l:charmap[l:choice[l:index]]
+            let pair .= charmap[choice[index]]
         catch /E716/
             " If it doens't have a pair, use the choice itself
-            let l:pair .= l:choice[l:index]
+            let pair .= choice[index]
         catch /E713/
             " Either entered nothing, or pressed <ESC>
             normal `<
             return
         endtry
 
-        let l:index = l:index + 1
+        let index = index + 1
     endwhile
 
     " Now wrap the selection with the selected character and it's pair
-    execute "normal `>a" . l:pair . "\<ESC>`<i" . l:choice . "\<ESC>"
+    execute "normal `>a" . pair . "\<ESC>`<i" . choice . "\<ESC>"
 endfunction
 
 " Function for preparing an SVN commit. Just do PrepareSVNCommit command and
@@ -500,39 +500,39 @@ function! DoHighlight(...)
 
     if @" != ""
         if a:0 > 0 && a:1 == 1
-            let l:case_s = "\\<"
-            let l:case_e = "\\>"
+            let case_s = "\\<"
+            let case_e = "\\>"
         else
-            let l:case_s = ""
-            let l:case_e = ""
+            let case_s = ""
+            let case_e = ""
         endif
 
         " Get the text, escape and insert to the list, so that it'll becomes a LIFO
-        let l:text = escape(@", "$.*/~[]")
-        call add(w:J_highlighting, l:case_s . l:text . l:case_e)
+        let text = escape(@", "$.*/~[]")
+        call add(w:J_highlighting, case_s . text . case_e)
     endif
 
     " Now create the match command with all of the items in the list
-    let l:i = 0
-    let l:num_items = len(w:J_highlighting)
+    let i = 0
+    let num_items = len(w:J_highlighting)
 
-    let l:pattern = ""
-    while l:i < l:num_items
-        let l:pattern .= w:J_highlighting[l:i]
+    let pattern = ""
+    while i < num_items
+        let pattern .= w:J_highlighting[i]
 
         " Append a \|, but for the last element in the list
-        if l:i < (l:num_items - 1)
-            let l:pattern .= "\\|"
+        if i < (num_items - 1)
+            let pattern .= "\\|"
         endif
 
-        let l:i += 1
+        let i += 1
     endwhile
 
     " Finally run the match command
-    if l:pattern == ""
+    if pattern == ""
         match
     else
-        execute "match Todo /" . l:pattern . "/"
+        execute "match Todo /" . pattern . "/"
     endif
 endfu
 
@@ -543,33 +543,33 @@ function! UndoHighlight()
         return
     endif
 
-    let l:i = 0
-    let l:num_items = len(w:J_highlighting)
+    let i = 0
+    let num_items = len(w:J_highlighting)
 
     " Clear all option
-    let l:item = printf("%2d: %s", 0, "<ALL>")
-    echo l:item
+    let item = printf("%2d: %s", 0, "<ALL>")
+    echo item
 
-    while l:i < l:num_items
-        let l:item = printf("%2d: \"%s\"", l:i + 1, w:J_highlighting[l:i])
-        echo l:item
+    while i < num_items
+        let item = printf("%2d: \"%s\"", i + 1, w:J_highlighting[i])
+        echo item
 
-        let l:i = l:i + 1
+        let i = i + 1
     endwhile
 
-    let l:choice = input("Select a string to unhilight: ")
-    if l:choice == ""
+    let choice = input("Select a string to unhilight: ")
+    if choice == ""
         return
-    elseif l:choice == 0
+    elseif choice == 0
         " Clear highlighting and reset list
         match
         let w:J_highlighting = []
     else
         " Try to get the element
-        if get(w:J_highlighting, l:choice - 1, "ERROR") == "ERROR"
+        if get(w:J_highlighting, choice - 1, "ERROR") == "ERROR"
             return
         else
-            call remove(w:J_highlighting, l:choice - 1)
+            call remove(w:J_highlighting, choice - 1)
 
             " If this isn't empty, DoHighlight() will try to add highlighting
             let @" = ""
@@ -588,83 +588,83 @@ function! AlignVert(direction) range
         return
     endif
 
-    let l:cur_start = getpos("'<")
-    let l:cur_end   = getpos("'>")
+    let cur_start = getpos("'<")
+    let cur_end   = getpos("'>")
 
     " Sanity checks. We've to consider the offset since 've' is set
-    if    l:cur_start[1] == 0 ||
-        \ l:cur_start[2] == 0 ||
-        \ l:cur_end[1] == 0   ||
-        \ l:cur_end[2] == 0
+    if    cur_start[1] == 0 ||
+        \ cur_start[2] == 0 ||
+        \ cur_end[1] == 0   ||
+        \ cur_end[2] == 0
         echo "No visual selection made"
         return
     endif
 
     " Got to the first column
     normal `<
-    let l:i = 0
+    let i = 0
 
     if a:direction ==? "l"
-        for l:i in range(l:cur_start[1], l:cur_end[1])
+        for i in range(cur_start[1], cur_end[1])
             normal dwj
         endfor
     elseif a:direction ==? "r"
-        let l:shift = input("Shift from start of line (y/n)? ", "n")
-        if l:shift !=? "n" && l:shift !=? "y"
+        let shift = input("Shift from start of line (y/n)? ", "n")
+        if shift !=? "n" && shift !=? "y"
             echo "Invalid input"
             return
-        elseif l:shift ==? "n"
-            let l:move_cmd = input("Enter the command to select dragging point: ", "1B")
-            if l:move_cmd !~? "^\\d*b$"
-                let l:move_cmd = "B"
+        elseif shift ==? "n"
+            let move_cmd = input("Enter the command to select dragging point: ", "1B")
+            if move_cmd !~? "^\\d*b$"
+                let move_cmd = "B"
             endif
         endif
 
         " Save and later restore the marks
-        let l:save_a = getpos("'a")
-        let l:save_b = getpos("'b")
-        let l:save_c = getpos("'c")
+        let save_a = getpos("'a")
+        let save_b = getpos("'b")
+        let save_c = getpos("'c")
 
-        for l:i in range(l:cur_start[1], l:cur_end[1])
-            if l:shift ==? "n"
-                execute "normal ma" . l:move_cmd . "mb$mclv`ar `bv`cd$p`aj"
+        for i in range(cur_start[1], cur_end[1])
+            if shift ==? "n"
+                execute "normal ma" . move_cmd . "mb$mclv`ar `bv`cd$p`aj"
             else
                 normal ma^mb$mclv`ar `bv`cd$p`aj
             endif
         endfor
 
-        call setpos("'a", l:save_a)
-        call setpos("'b", l:save_b)
-        call setpos("'c", l:save_c)
+        call setpos("'a", save_a)
+        call setpos("'b", save_b)
+        call setpos("'c", save_c)
     endif
 endfu
 
 " Function to insert a (possibly) unique time stamp. This can be used to refer to other locations in
 " the code obviating the need for line-no. and similar references
 function! InsertTimestamp(count) range
-    let l:count = a:count
-    let l:cursor_pos = getpos(".")
+    let i = a:count
+    let cursor_pos = getpos(".")
 
     if !executable("uuidgen") || !executable("awk")
         echo "Couldn't find necessary executables"
         return
     endif
 
-    while l:count > 0
+    while i > 0
         " This will insert the timestamp onto a new line; hence we've to join lines
         execute "r !uuidgen | awk -F- '{printf $NF}'"
 
-        let l:count -= 1
+        let i -= 1
     endwhile
 
     if a:count == 1
         " Only one to insert; and let it remain inline ;)
         normal diw"_dd
-        call setpos(".", l:cursor_pos)
+        call setpos(".", cursor_pos)
         normal gP
     else
         " We just inserted the last timestamp; now move to where we were
-        call setpos(".", l:cursor_pos)
+        call setpos(".", cursor_pos)
     endif
 endfu
 
@@ -685,31 +685,31 @@ endfunction
 " * Tab title only shows the base name of the file, and this would
 "   save space, and is more readable
 function MakeTabLine()
-    let l:tab_line = ''
-    for l:i in range(tabpagenr('$'))
+    let tab_line = ''
+    for i in range(tabpagenr('$'))
         " select the highlighting
-        if l:i + 1 == tabpagenr()
-            let l:tab_line .= '%#TabLineSel#'
+        if i + 1 == tabpagenr()
+            let tab_line .= '%#TabLineSel#'
         else
-            let l:tab_line .= '%#TabLine#'
+            let tab_line .= '%#TabLine#'
         endif
 
         " set the tab page number (for mouse clicks)
-        let l:tab_line .= '%' . (l:i + 1) . 'T'
+        let tab_line .= '%' . (i + 1) . 'T'
 
         " the label is made by MyTabLabel()
-        let l:tab_line .= GetTabFileName(l:i + 1) " 9ea3b718f344
+        let tab_line .= GetTabFileName(i + 1) " 9ea3b718f344
     endfor
 
     " after the last tab fill with TabLineFill and reset tab page nr
-    let l:tab_line .= '%#TabLineFill#%T'
+    let tab_line .= '%#TabLineFill#%T'
 
     " right-align the label to close the current tab page
     if tabpagenr('$') > 1
-        let l:tab_line .= '%=%#TabLine#%999Xclose'
+        let tab_line .= '%=%#TabLine#%999Xclose'
     endif
 
-    return l:tab_line
+    return tab_line
 endfunction
 
 " Function which creates a title strength for a single tab page. This is invoked
@@ -717,22 +717,22 @@ endfunction
 " (See: 7d0ec10437cd)
 function GetTabFileName(n)
     " List of buffers in the tab
-    let l:buf_list = tabpagebuflist(a:n)
+    let buf_list = tabpagebuflist(a:n)
     " The active window in the tab
-    let l:win_in_tab = tabpagewinnr(a:n)
+    let win_in_tab = tabpagewinnr(a:n)
     " Buffer number contained in the active window
-    let l:buffer_number = l:buf_list[l:win_in_tab - 1]
+    let buffer_number = buf_list[win_in_tab - 1]
     " Get the basename of name of the file loaded in the buffer
-    let l:buffer_name = fnamemodify(bufname(l:buffer_number), ":t")
+    let buffer_name = fnamemodify(bufname(buffer_number), ":t")
 
     " Start with the tab number
-    let l:prefix = " " . a:n . " "
+    let prefix = " " . a:n . " "
 
-    if getbufvar(l:buffer_number, "&modified") == 1
-        let l:prefix .= "+ "
+    if getbufvar(buffer_number, "&modified") == 1
+        let prefix .= "+ "
     endif
 
-    return l:prefix . l:buffer_name . " "
+    return prefix . buffer_name . " "
 endfunction
 " ****************************************************
 " ***************** END FUNCTIONS ********************
