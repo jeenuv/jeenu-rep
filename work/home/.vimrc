@@ -78,6 +78,9 @@ set runtimepath+=~/.vim
 " Make tab lines in my way!
 set tabline=%!MakeTabLine()
 
+" I want to use mouse everywhere
+set mouse=a
+
 " If running under Cygwin, we need to add \ to file name characters
 if $PATH =~? "/cygdrive"
     set isf+=\\
