@@ -30,6 +30,7 @@ alias G='grep'
 
 # This is supposed to be used after a '|' from shell
 alias Q="GREP_OPTIONS= grep -v .svn/ > ~/tmp/errors && env -u DISPLAY vim -q ~/tmp/errors"
+alias VP="GREP_OPTIONS= grep -v .svn/ > ~/tmp/errors && env -u DISPLAY vimproj -q ~/tmp/errors"
 
 ###########################
 ####  Shell Variables  ####
@@ -55,7 +56,7 @@ HISTCONTROL=ignorespace:ignoredups:erasedups
 HISTIGNORE='mplayer*'
 
 # Some commonly used Grep options
-GREP_OPTIONS='-nHI --exclude=\*.svn-base'
+export GREP_OPTIONS='-nHI --exclude=\*.svn-base'
 
 # Create a tmp directory
 if [ ! -d ~/tmp ]; then
