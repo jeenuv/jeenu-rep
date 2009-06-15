@@ -20,10 +20,10 @@ syn case match
 syn match armComment            ";.*$"
 
 "numbers
-syn match armNumber             "=[a-zA-Z][a-zA-Z0-9]\+\>"
+syn match armNumber             "=[a-zA-Z][a-zA-Z0-9_]\+\>"
 syn match armNumber             "#[0-9]\+\>"
 syn match armNumber             "#\?0x[A-Fa-f0-9]\+\>"
-syn match armNumber             "#[a-zA-Z][a-zA-z0-9]\+\>"
+syn match armNumber             "#[a-zA-Z][a-zA-z0-9_]\+\>"
 syn match armNumber             "\<[0-9]\+\>"
 syn match armNumber             "[-+][0-9]\+\>"
 syn match armNumber             "[-+][0-9a-fA-F]\+\>"
@@ -48,6 +48,7 @@ syn case ignore
 "registers
 syn match armRegister           "\<[CRP][0-9]"
 syn match armRegister           "\<R1[0-5]"
+syn match armRegister           "\<P1[0-5]"
 syn keyword armRegister         LR PC SP CPSR SPSR
 
 
