@@ -9,9 +9,10 @@ PROFILE_BM="$HOME/.book"
 # Read the bookmarks
 function bmread()
 {
+    local question="bmread: Are you sure you want to continue?"
     if [ "$CHANGED_BM" -ne 0 ]; then
         echo "bmread: There are new bookmarks. Unsaved bookmarks will be overwritten when reading."
-        if ! confirm "You want to continue?"; then
+        if ! confirm "$question"; then
             return 1
         fi
     fi
@@ -26,7 +27,7 @@ function bmread()
     if cat "$PROFILE_BM" | grep -q '\$TEMPLATE_BM'; then
         # If it's templated, check for $TEMPLATE_BM
         bmtemplate
-        if ! confirm "bmread: Are you sure you want to continue?"; then
+        if ! confirm "$question"; then
             return 1;
         fi
     fi
