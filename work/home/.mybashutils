@@ -200,6 +200,7 @@ function bmprofile()
     if ! bmread; then
         PROFILE_BM="$old_profile"
         echo "bmprofile: Old bookmark profile restored"
+        return 1
     fi
 }
 
