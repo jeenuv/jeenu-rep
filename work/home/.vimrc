@@ -466,6 +466,11 @@ endfunction
 " Function for preparing an SVN commit. Just do PrepareSVNCommit command and
 " you'll get the list of files eligible for commit
 function! PrepareSVNCommit()
+    if ! isdirectory(".svn")
+        echo getcwd() . " is not an SVN WC"
+        return 1
+    endif
+
     set tw=80                          " Set text width to 80
     set ft=sh|                         " Set sh filetype for clarity
     normal isvn ci
