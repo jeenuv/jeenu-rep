@@ -308,6 +308,10 @@ command! -range -nargs=1 Align call AlignVert("<args>")
 " Insert a (possibly) unique timestamp
 command -nargs=0 -count=1 Timestamp call InsertTimestamp("<count>")
 
+" Toggles the tabline to contained chopped full-path or just basename
+let g:J_TablineFullPath = 0
+command -nargs=0 ToggleTabline call ToggleTabline()
+
 if has("unix")
     " Get all the files in the current directory and then wrap them in quotes.
     " This is intended to be used with C-x C-e command in bash
@@ -721,7 +725,7 @@ function MakeTabLine()
 endfunction
 
 " Function which creates a title strength for a single tab page. This is invoked
-" by MakeTabLine() S(ee: 9ea3b718f344) and used in setting GUI tab label
+" by MakeTabLine() (See: 9ea3b718f344) and used in setting GUI tab label
 " (See: 7d0ec10437cd)
 function GetTabFileName(n)
     " List of buffers in the tab
@@ -730,8 +734,13 @@ function GetTabFileName(n)
     let win_in_tab = tabpagewinnr(a:n)
     " Buffer number contained in the active window
     let buffer_number = buf_list[win_in_tab - 1]
-    " Get the basename of name of the file loaded in the buffer
-    let buffer_name = fnamemodify(bufname(buffer_number), ":t")
+    if g:J_TablineFullPath
+        " Get the basename of name of the file loaded in the buffer
+        let buffer_name = substitute(fnamemodify(bufname(buffer_number), ":."), '/\(.\)[^/]\+/\@=', '/\1', 'g')
+    else
+        " Get the basename of name of the file loaded in the buffer
+        let buffer_name = fnamemodify(bufname(buffer_number), ":t")
+    endif
 
     " Start with the tab number
     let prefix = " [" . a:n . "] "
@@ -741,6 +750,10 @@ function GetTabFileName(n)
     endif
 
     return prefix . buffer_name . " "
+endfunction
+
+function ToggleTabline()
+    let g:J_TablineFullPath = g:J_TablineFullPath ? 0: 1
 endfunction
 " ****************************************************
 " ***************** END FUNCTIONS ********************
