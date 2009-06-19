@@ -310,7 +310,7 @@ command -nargs=0 -count=1 Timestamp call InsertTimestamp("<count>")
 
 " Toggles the tabline to contained chopped full-path or just basename
 let g:J_TablineFullPath = 0
-command -nargs=0 ToggleTabline call ToggleTabline()
+command -nargs=0 ToggleTabline call ToggleTabline()|normal <C-L>
 
 if has("unix")
     " Get all the files in the current directory and then wrap them in quotes.
@@ -735,11 +735,11 @@ function GetTabFileName(n)
     " Buffer number contained in the active window
     let buffer_number = buf_list[win_in_tab - 1]
     if g:J_TablineFullPath
-        " Get the basename of name of the file loaded in the buffer
-        let buffer_name = substitute(fnamemodify(bufname(buffer_number), ":."), '/\(.\)[^/]\+/\@=', '/\1', 'g')
+        " Get full path of the file loaded in the buffer
+        let buffer_name = substitute(substitute(fnamemodify(bufname(buffer_number), ":."), '/$', '', ''), '/\(/*.\)[^/]\+/\@=', '/\1', 'g')
     else
         " Get the basename of name of the file loaded in the buffer
-        let buffer_name = fnamemodify(bufname(buffer_number), ":t")
+        let buffer_name = fnamemodify(substitute(bufname(buffer_number), '/$', '', ''), ":t")
     endif
 
     " Start with the tab number
@@ -755,6 +755,7 @@ endfunction
 function ToggleTabline()
     let g:J_TablineFullPath = g:J_TablineFullPath ? 0: 1
 endfunction
+
 " ****************************************************
 " ***************** END FUNCTIONS ********************
 " ****************************************************
