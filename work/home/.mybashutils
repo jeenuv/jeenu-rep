@@ -92,10 +92,8 @@ function go()
     local dir
 
     if [ "$#" -lt 1 ]; then
-        echo "go where?"
-        echo
-        bms
-        return
+        echo "go: Go where? Try bms to see bookmarked locations"
+        return 1
     fi
 
     if [ -z "$(eval echo \${bm_$1})" ]; then
@@ -122,10 +120,12 @@ function bms()
         return
     fi
 
-    printf "%-20s%s\n%-20s%s\n" Bookmark Location ========== ==========
-    for i in ${!bm_*}; do
-        eval "printf \"%-20s%s\\n\" ${i/bm_/} \$$i"
-    done
+    {
+        printf "%-20s%s\n%-20s%s\n" Bookmark Location ========== ==========
+        for i in ${!bm_*}; do
+            eval "printf \"%-20s%s\\n\" ${i/bm_/} \$$i"
+        done
+    } | less -F
 }
 
 function bmwrite()
