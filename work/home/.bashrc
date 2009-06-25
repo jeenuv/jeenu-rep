@@ -224,6 +224,9 @@ function rm()
 # The command to get the list of processes is first obtained from $PS_COMMAND, if set.
 # This is particularly useful in Cygwin, where -W, a non standard option, is needed to
 # view Windows processes
+#
+# If there's a second argument, that's assumed as a command to be executed after woke
+# up from sleep
 function waitfor()
 {
     local pat
@@ -236,7 +239,8 @@ function waitfor()
     # Convert, say, wget to [w]get
     pat="$(echo "$1" | sed 's/./[&]/')"
     while $ps_command | grep -q "$pat"; do
-        sleep 10
+        sleep 5
+        $2
     done
 }
 
