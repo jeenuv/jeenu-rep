@@ -28,7 +28,7 @@ alias T='tail'
 alias H='head'
 alias G='grep'
 # Colorize diff output
-alias D="sed 's/^\(Index\|---\|+++\).*/[1;32m&[0m/;s/^-.*/[1;35m&[0m/;s/^+.*/[1;36m&[0m/;s/^@@.*/[1;33m&[0m/'"
+alias D="sed 's/^\(Index\|---\|+++\).*/[1;32m&[0m/;s/^-.*/[1;35m&[0m/;s/^+.*/[1;36m&[0m/;s/^@@.*/[1;33m&[0m/' | L"
 
 # This is supposed to be used after a '|' from shell
 alias Q="GREP_OPTIONS= grep -v .svn/ > ~/tmp/errors && env -u DISPLAY vim -q ~/tmp/errors"
