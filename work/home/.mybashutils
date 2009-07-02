@@ -120,12 +120,10 @@ function bms()
         return
     fi
 
-    {
-        printf "%-20s%s\n%-20s%s\n" Bookmark Location ========== ==========
-        for i in ${!bm_*}; do
-            eval "printf \"%-20s%s\\n\" ${i/bm_/} \$$i"
-        done
-    } | less -F
+    printf "%-20s%s\n%-20s%s\n" Bookmark Location ========== ==========
+    for i in ${!bm_*}; do
+        eval "printf \"%-20s%s\\n\" ${i/bm_/} \$$i"
+    done
 }
 
 function bmwrite()
