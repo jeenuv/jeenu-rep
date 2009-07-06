@@ -244,6 +244,11 @@ function waitfor()
         return 1
     fi
 
+    if ! which getopt >/dev/null; then
+        echo "waitfor: This function requires GNU getopt in \$PATH"
+        return 1
+    fi
+
     eval set -- $(getopt -o "w:t:c:" -q -- "$@")
 
     if [ "$?" -ne 0 -a "$?" -ne 1 ]; then
