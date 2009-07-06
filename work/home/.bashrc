@@ -193,6 +193,7 @@ function rm()
             --)
             shift
             local arguments="$@"
+            break
             ;;
         esac
 
@@ -233,16 +234,60 @@ function waitfor()
 {
     local pat
     local ps_command="${PS_COMMAND:-ps aux}"
+    local usage="Usage: waitfor [-w <until>] [-t <wait>] [-c <command>] identifier"
+    local wait_until=0
+    local wait_time=5
+    local wait_command=
 
-    if [ -z "$1" ]; then
+    if [ -z "$*" ]; then
+        echo "$usage"
         return 1
     fi
 
+    eval set -- $(getopt -o "w:t:c:" -q -- "$@")
+
+    if [ "$?" -ne 0 -a "$?" -ne 1 ]; then
+        echo "waitfor: 'getopt' returned error"
+        return 1
+    fi
+
+    until [ -z "$*" ]; do
+        case "$1" in
+            -w)
+            shift
+            wait_until="$1"
+            ;;
+
+            -t)
+            shift
+            wait_time="$1"
+            ;;
+
+            -c)
+            shift
+            wait_command="$1"
+            ;;
+
+            --)
+            shift
+            break
+            ;;
+        esac
+
+        shift
+    done
+
+    if [ -z "$1" ]; then
+        echo "$usage"
+        return 1
+    fi
+
+    sleep "$wait_until"
     # Convert, say, wget to [w]get
     pat="$(echo "$1" | sed 's/./[&]/')"
     while $ps_command | grep -q "$pat"; do
-        sleep 5
-        $2
+        $wait_command
+        sleep "$wait_time"
     done
 }
 
