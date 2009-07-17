@@ -1,0 +1,28 @@
+#!/bin/bash
+
+eval set -- $(getopt -o "xo" -- "$@")
+
+f=d
+until [ -z "$*" ]; do
+    case "$1" in
+        -x)
+        f=x
+        ;;
+
+        -o)
+        f=o
+        ;;
+
+        --)
+        shift
+        break
+        ;;
+    esac
+
+    shift
+done
+
+for i; do
+    let "x = $i"
+    eval "printf \"%#$f\\n\" \"\$x\""
+done
