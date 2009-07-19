@@ -69,7 +69,7 @@ fi
 sleep "$wait_until"
 # Convert, say, wget to [w]get
 pat="$(echo "$1" | sed 's/./[&]/')"
-while $ps_command | grep -q "$pat"; do
+while $ps_command | grep -v waitfor | grep -q "$pat"; do
     $wait_command
     sleep "$wait_time"
 done
