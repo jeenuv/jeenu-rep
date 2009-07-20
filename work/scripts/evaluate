@@ -1,6 +1,18 @@
 #!/bin/bash
 
-eval set -- $(getopt -o "xo" -- "$@")
+usage="\
+Usage: evaluate [-xo] expression [expression [...]]
+    -x      Print result in hex
+    -o      Print result in octal
+Results are printed in decimal by default"
+
+ARGS="$(getopt -o "xo" -- "$@")"
+if [ $? -ne 0 ]; then
+    echo "$usage"
+    exit 1
+fi
+
+eval set -- "$ARGS"
 
 f=d
 until [ -z "$*" ]; do
@@ -23,11 +35,7 @@ until [ -z "$*" ]; do
 done
 
 if [ -z "$*" ]; then
-    echo "\
-Usage: evaluate [-xo] expression [expression [...]]
-    -x      Print result in hex
-    -o      Print result in octal
-Results are printed in decimal by default"
+    echo "$usage"
     exit 1
 fi
 
