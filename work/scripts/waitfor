@@ -13,7 +13,11 @@
 
 pat=
 ps_command="${PS_COMMAND:-ps aux}"
-usage="Usage: waitfor [-w <until>] [-t <wait>] [-c <command>] identifier"
+usage="\
+Usage: waitfor [-u <until>] [-t <wait>] [-c <command>] identifier
+    -u      Don't start wait loop until specified seconds has elapsed
+    -t      Delay in seconds for wait loop
+    -c      Command to be executed in wait loop"
 wait_until=0
 wait_time=5
 wait_command=
@@ -28,7 +32,7 @@ if ! which getopt >/dev/null; then
     exit 1
 fi
 
-eval set -- $(getopt -o "w:t:c:" -q -- "$@")
+eval set -- $(getopt -o "u:t:c:" -q -- "$@")
 
 if [ "$?" -ne 0 -a "$?" -ne 1 ]; then
     echo "waitfor: 'getopt' returned error"
@@ -37,7 +41,7 @@ fi
 
 until [ -z "$*" ]; do
     case "$1" in
-        -w)
+        -u)
         shift
         wait_until="$1"
         ;;
