@@ -41,5 +41,5 @@ fi
 
 for i; do
     let "x = $i"
-    eval "printf \"\$i: %#$f\\n\" \"\$x\""
+    eval "printf \"\$i = %#$f\\n\" \"\$x\""
 done
