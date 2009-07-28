@@ -32,13 +32,13 @@ if ! which getopt >/dev/null; then
     exit 1
 fi
 
-eval set -- $(getopt -o "u:t:c:" -q -- "$@")
-
+ARGS=$(getopt -o "u:t:c:" -q -- "$@")
 if [ "$?" -ne 0 -a "$?" -ne 1 ]; then
     echo "waitfor: 'getopt' returned error"
     exit 1
 fi
 
+eval set -- "$ARGS"
 until [ -z "$*" ]; do
     case "$1" in
         -u)
