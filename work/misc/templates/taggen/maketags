@@ -7,56 +7,69 @@ function script_echo()
 
 function buildfiles()
 {
+    local taglist="${LIST[$1]}"
+    local tagdirs="${DIRS[$1]}"
+    local findexpr="${FINDEXPR[$1]}"
 
-    if [ -f "$2" ]; then
-        read -p "$PROGNAME: delete and remake $2 (y/n)? "
-        if [ "$REPLY" = "y" -o "$REPLY" = "Y" ]; then
-            rm "$2"
+    if [ -f "$taglist" ]; then
+        if confirm "delete and remake $taglist"; then
+            rm "$taglist"
             script_echo "building list of files"
-            find $1 -name .svn -prune -o $(echo $FIND_EXPR) -print > "$2"
+            find $tagdirs -name .svn -prune -o $findexpr -print > "$taglist"
         fi
     else
         script_echo "building list of files"
-        find $1 -name .svn -prune -o $(echo $FIND_EXPR) -print > "$2"
+        find $tagdirs -name .svn -prune -o $findexpr -print > "$taglist"
     fi
 }
 
 PROGNAME=$(basename $0)
 THISDIR=$( (cd $(dirname $0) && pwd) )
-TAGLIST=files.ctags.list
+
+LIST=files.ctags.list
 CSCOPELIST=files.cscope.list
 
 cd "$THISDIR"
 
 [ -f initrc ] && source initrc
 
-if [ -z "$PROJECT_ROOT" ]; then
-    script_echo "\$PROJECT_ROOT is not set!"
+if [ "${PROJECT_ROOT:0:1}" != "/" ]; then
+    script_echo "\$PROJECT_ROOT is not absolute"
+    exit 1
+elif [ -z "$PROJECT_ROOT" ] || [ ! -d "$PROJECT_ROOT" ]; then
+    script_echo "PROJECT_ROOT '$PROJECT_ROOT' is not accessible"
+    exit 1
 else
     script_echo "using \$PROJECT_ROOT as $PROJECT_ROOT"
 fi
 
-FIND_EXPR="( -iname *.cpp -o -iname *.h -o -iname *.inl -o -iname *.s -o -iname *.cia -o -iname *.inc )"
-TAGDIRS="$PROJECT_ROOT/e32
-         $PROJECT_ROOT/f32
-         $PROJECT_ROOT/bsp/hwip_arm"
-CSCOPEDIRS="$PROJECT_ROOT/e32
-            $PROJECT_ROOT/f32
-            $PROJECT_ROOT/bsp/hwip_arm"
+# Define tag data
+NAME[0]="main"
+FILENAME[0]="${NAME[0]}.tag"
+LIST[0]="${NAME[0]}.list"
+FINDEXPR[0]="( -iname *.cpp -o -iname *.h -o -iname *.inl -o -iname *.s -o -iname *.cia -o -iname *.inc )"
+DIRS[0]="$PROJECT_ROOT/sf/os/boardsupport/arm
+         $PROJECT_ROOT/sf/os/kernelhwsrv/kernel/eka
+         $PROJECT_ROOT/sf/os/kernelhwsrv/userlibandfileserver/fileserver
+         $PROJECT_ROOT/sf/os/kernelhwsrv/halservices"
 
-if [ ! -d "$PROJECT_ROOT" ]; then
-    script_echo "directory $PROJECT_ROOT doesn't exist!"
-    exit 1
-fi
+NAME[1]="test"
+FILENAME[1]="${NAME[1]}.tag"
+LIST[1]="${NAME[1]}.list"
+FINDEXPR[1]="${FINDEXPR[0]}"
+DIRS[1]="$PROJECT_ROOT/sf/os/kernelhwsrv/kerneltest/e32test
+         $PROJECT_ROOT/sf/os/kernelhwsrv/kerneltest/f32test"
 
-if confirm "build tags"; then
-    buildfiles "$TAGDIRS" "$TAGLIST"
+for index in "${!NAME[@]}"; do
+    if confirm "build tag '${NAME[$index]}'"; then
+        buildfiles "$index"
 
-    # Delete the tag file if already existing
-    [ -f "$TAGFILENAME" ] && rm $TAGFILENAME
+        # Delete the tag file if already existing
+        [ -f "${FILENAME[$index]}" ] && rm "${FILENAME[$index]}"
 
-    script_echo "building tags"
-    if ctags -L $TAGLIST \
+        script_echo "building tag '${NAME[$index]}'"
+        if ctags -L "${LIST[$index]}" \
+            -o "${FILENAME[$index]}" \
             --langmap=c++:+.inl,c++:+.cia,asm:+.inc \
             --extra=+f \
             --extra=+q \
@@ -64,18 +77,25 @@ if confirm "build tags"; then
             -I NONSHARABLE_CLASS=class\
             -I EXPORT_C \
             -I IMPORT_C; then
-        script_echo "tags built"
-    else
-        script_echo "error building tags"
+            script_echo "finished building tag '${NAME[$index]}'"
+        else
+            script_echo "error building tag '${NAME[$index]}'"
+        fi
     fi
-fi
+done
 
 ## CSCOPE setup
 
-if confirm "build cscope"; then
-    buildfiles "$CSCOPEDIRS" "$CSCOPELIST"
+NAME[2]="main"
+FILENAME[2]="${NAME[2]}.cscope"
+LIST[2]="${NAME[2]}.list"
+FINDEXPR[2]="${FINDEXPR[0]}"
+DIRS[2]="${DIRS[0]}"
 
-    if mlcscope -b -q -k -i "$CSCOPELIST" -f cscope; then
+if confirm "build cscope"; then
+    buildfiles 2
+
+    if mlcscope -b -q -k -i "${LIST[2]}" -f "${FILENAME[2]}"; then
         script_echo "cscope db built"
     else
         script_echo "error building cs db"

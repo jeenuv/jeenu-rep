@@ -1,7 +1,14 @@
 #!/bin/bash
 
+PROGNAME="$(basename "$0")"
+if ! which getopt >/dev/null; then
+    echo "$PROGNAME: This script requires GNU getopt in \$PATH"
+    echo "$must"
+    exit 1
+fi
+
 # Use the DISPLAY variable only for gvimproj
-if ! echo $0 | grep 'gvimproj'; then
+if ! echo "$PROGNAME" | grep -q 'gvimproj'; then
     export DISPLAY=
 fi
 
@@ -15,12 +22,34 @@ if ! which &>/dev/null "$EXE_NAME"; then
 fi
 
 COMMAND="$EXE_NAME -n"
+ARGS="$(getopt -o "t:" -q -- "$@")"
+if [ "$?" -ne 0 -a "$?" -ne 1 ]; then
+    exit 1
+fi
+
+eval set -- "$ARGS"
+
+until [ -z "$*" ]; do
+    case "$1" in
+        -t)
+        shift
+        tagname="$1"
+        ;;
+
+        --)
+        shift
+        break
+        ;;
+    esac
+
+    shift
+done
 
 if [ -z "$1" -o ! -d "$HOME/vimproj/$1" ]; then
     # All directory in the $HOME/vimproj directory
     PROJECTS="$( (cd "$HOME/vimproj" && find -maxdepth 1 -type d -printf "%f " | sed 's/\.//') )"
 elif [ -d "$HOME/vimproj/$1" ]; then
-    PROJECT_NAME=$1
+    PROJECT_NAME="$1"
     shift
 fi
 
@@ -36,8 +65,7 @@ if [ -z "$PROJECT_NAME" ]; then
     shift
 fi
 
-export PROJECT_NAME
-export PROJECT_LOC="$HOME/vimproj/$PROJECT_NAME"
+PROJECT_LOC="$HOME/vimproj/$PROJECT_NAME"
 
 # if there's vimrc file
 if [ -f "$PROJECT_LOC/vimrc" ]; then
@@ -49,5 +77,30 @@ COMMAND="$COMMAND -i $PROJECT_LOC/viminfo"
 
 # This would export what ever data required by project!
 [ -f "$PROJECT_LOC/initrc" ] && source $PROJECT_LOC/initrc
+
+# Check if tags exist
+for tag in $(echo "$tagname" | sed 's/,/ /g'); do
+    if [ -f "$PROJECT_LOC/$tag.tag" ]; then
+        PROJECT_TAGS="${PROJECT_TAGS}${PROJECT_LOC}/${tag}.tag,"
+    else
+        if ! confirm "$tag.tag doesn't exist in $PROJECT_NAME. Continue"; then
+            exit 1
+        fi
+    fi
+done
+
+# Add main.tag by default
+if ! echo "$PROJECT_TAGS" | grep -q "main.tag"; then
+    if [ -f "$PROJECT_LOC/main.tag" ]; then
+        PROJECT_TAGS="$PROJECT_LOC/main.tag,${PROJECT_TAGS}"
+    else
+        if ! confirm "main.tag doesn't exist in $PROJECT_NAME. Continue"; then
+            exit 1
+        fi
+    fi
+fi
+
+export PROJECT_TAGS
+export PROJECT_LOC
 
 exec $COMMAND "$@"

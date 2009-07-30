@@ -8,14 +8,18 @@ endif
 let s:this_dir =  $PROJECT_LOC
 
 " Root directory for project files
-let s:root_dir = "/cygdrive/f/Symbian/M04820_Symbian_OS_v9.6/src/CEDAR/GENERIC/base"
+let s:root_dir = $PROJECT_ROOT
 
-exe "set tags+=" . s:this_dir . "/" . "tags"
+let &tags = $PROJECT_TAGS
 
-set path=.
-exe "set path=.," . s:root_dir . "/e32/include/**"
+set path=.,,
+exe "set path+=" . s:root_dir . "/sf/os/kernelhwsrv/kernel/eka/include"
+exe "set path+=" . s:root_dir . "/sf/os/boardsupport/arm"
 
 set foldopen-=block
+
+" Only look for .h files with gf and friends
+set suffixesadd=.h
 
 " Set the grep path
 exe "set grepprg=grep\\ -nr\\ '$*'\\ " . s:root_dir . "\\ \\\\\\|\\ sed\\ \\\"/\\\\.svn/d\\\""
@@ -23,9 +27,25 @@ exe "set grepprg=grep\\ -nr\\ '$*'\\ " . s:root_dir . "\\ \\\\\\|\\ sed\\ \\\"/\
 " Modify makeprg to accomodate arguments
 " set makeprg=make\ $*
 
+set nowrap
+
+au BufRead,BufNew *.cia set ft=cpp
+au BufRead,BufNew *.cpp,*.h,*.inl,*.cia,*s,*.inc source ~/jeenu-rep/work/vim/symbian.vim
+
+if filereadable($HOME . "/.vim/syntax/arm_asm.vim")
+    au BufNewFile,BufRead *.s,*.inc set ft=arm_asm
+endif
+
+" We've lot of multiple tag definitions
+nmap g<C-]> :tj <C-R><C-W><CR>
+
+vmap <C-]>  y:<C-U>tj <C-R>"<CR>
+vmap g<C-]> y:<C-U>tj <C-R>"<CR>
+vmap <C-W><C-]> y:<C-U>stj <C-R>"<CR>
+
 " Add cscope database connection
-if filereadable(s:this_dir . "/cscope")
-    exe "cscope add " . s:this_dir . "/cscope"
+if filereadable(s:this_dir . "/main.cscope")
+    exe "cscope add " . s:this_dir . "/main.cscope"
     set nocst           " Don't search the cs db, but use ctags, on CTRL-]
     set csto=0          " If at all a :cstag is performed, use the cs db rather than the tag
     set csqf=c-,t-,e-   " Use quickfix window for caller and assignment search
@@ -33,6 +53,4 @@ else
     echo "Couldn't find the cs db!"
 endif
 
-au BufRead,BufNew *.cia setf cpp
-au BufRead,BufNew *.cpp,*.h,*.inl,*.cia source ~/jeenu-rep/work/vim/symbian.vim
-au BufRead,BufNew *.s,*.inc set ft=arm_asm
+command T :tags
