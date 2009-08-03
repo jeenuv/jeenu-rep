@@ -26,13 +26,12 @@ alias L='less -iRSw'
 alias V='env -u DISPLAY vim -nR -'
 alias T='tail'
 alias H='head'
-alias G='grep'
 # Colorize diff output
 alias D="sed 's/^\(Index\|---\|+++\).*/[1;32m&[0m/;s/^-.*/[1;35m&[0m/;s/^+.*/[1;36m&[0m/;s/^@@.*/[1;33m&[0m/' | L"
 
 # This is supposed to be used after a '|' from shell
-alias Q="GREP_OPTIONS= grep -v .svn/ > ~/tmp/errors && env -u DISPLAY vim -q ~/tmp/errors"
-alias VP="GREP_OPTIONS= grep -v .svn/ > ~/tmp/errors && env -u DISPLAY vimproj -q ~/tmp/errors"
+alias G='GREP_OPTIONS=-nHI\ --exclude=\*.svn-base grep'
+alias Q="grep -v .svn/ > ~/tmp/errors && env -u DISPLAY vim -q ~/tmp/errors"
 
 ###########################
 ####  Shell Variables  ####
@@ -56,9 +55,6 @@ HISTSIZE=1000
 # Histroy control
 HISTCONTROL=ignorespace:ignoredups:erasedups
 HISTIGNORE='mplayer*'
-
-# Some commonly used Grep options
-export GREP_OPTIONS='-nHI --exclude=\*.svn-base'
 
 # Create a tmp directory
 if [ ! -d ~/tmp ]; then
