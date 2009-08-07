@@ -30,7 +30,7 @@ alias H='head'
 alias D="sed 's/^\(Index\|---\|+++\).*/[1;32m&[0m/;s/^-.*/[1;35m&[0m/;s/^+.*/[1;36m&[0m/;s/^@@.*/[1;33m&[0m/' | L"
 
 # This is supposed to be used after a '|' from shell
-alias G='GREP_OPTIONS=-nHI\ --exclude=\*.svn-base grep'
+alias G='grep -nHI --exclude=\*.svn-base'
 alias Q="grep -v .svn/ > ~/tmp/errors && env -u DISPLAY vim -q ~/tmp/errors"
 
 ###########################
