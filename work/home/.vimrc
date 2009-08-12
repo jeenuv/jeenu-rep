@@ -287,10 +287,19 @@ endif
 " For trucating trailing whitespace
 command! TruncW :%s/\s\+$//ce |
 
-" For doing a diff on the BASE version from within Vim
-command! SVNBaseDiff   execute "!svn diff % > ~/tmp/svnpatchfile"|
-                     \ set patchexpr=DoSVNPatch()|
-                     \ vert diffp ~/tmp/svnpatchfile|
+" For doing an SVN diff on the BASE version from within Vim
+command! SVNBaseDiff   execute "!svn diff % > ~/tmp/patchfile"|
+                     \ set patchexpr=MyPatch()|
+                     \ vert diffp ~/tmp/patchfile|
+                     \ windo set fdm=diff|
+                     \ set patchexpr&|
+                     \ wincmd p
+
+" For doing a Git diff within Vim. Need the --cached option because index is populated
+" already, without which git diff will give empty output
+command! GitDiff execute "!git diff --cached -p --no-prefix -- % > ~/tmp/patchfile"|
+                     \ set patchexpr=MyPatch()|
+                     \ vert diffp ~/tmp/patchfile|
                      \ windo set fdm=diff|
                      \ set patchexpr&|
                      \ wincmd p
@@ -686,7 +695,7 @@ endfunction
 " such patches would fail. The manual says this options wouldn't have any
 " effect in POSIX comliant systems and hence is harmless when use in other
 " situations
-function DoSVNPatch()
+function MyPatch()
     call system("patch --binary -Ro " . escape(v:fname_out, ' \') . " " . escape(v:fname_in, ' \') . " < " .  escape(v:fname_diff, ' \'))
 endfunction
 
