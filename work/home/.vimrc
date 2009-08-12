@@ -297,7 +297,7 @@ command! SVNBaseDiff   execute "!svn diff % > ~/tmp/patchfile"|
 
 " For doing a Git diff within Vim. Need the --cached option because index is populated
 " already, without which git diff will give empty output
-command! GitDiff execute "!git diff --cached -p --no-prefix -- % > ~/tmp/patchfile"|
+command! GitDiff execute "!git diff --cached -p --no-prefix --no-ext-diff -- % > ~/tmp/patchfile"|
                      \ set patchexpr=MyPatch()|
                      \ vert diffp ~/tmp/patchfile|
                      \ windo set fdm=diff|
