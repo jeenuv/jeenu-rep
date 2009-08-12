@@ -10,7 +10,7 @@ function svnmodified()
 }
 
 # Recursively show diffs for all the modified files
-function showdiffs()
+function svnshowdiffs()
 {
     local i
 
