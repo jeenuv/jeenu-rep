@@ -93,11 +93,12 @@ syn match armStoreMKeyword      "\<STM\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc
 
 syn keyword armInstruction      HALT SWI MCR MRC LSL ASL LSR ASR ROR RRX SETCPSR SETSPSR GETCPSR ADR
 
-syn keyword armAssembler        IF ELSE ENDIF MACRO MEND EXPORT IMPORT GBLL INCLUDE CODE READONLY ALIGN AREA END DCB DCD DCDU DCW DCWU DCDO SPACE FILL
+syn keyword armAssembler        IF ELSE ENDIF MACRO MEND EXPORT IMPORT GBLL INCLUDE CODE READONLY ALIGN AREA END DCB DCD DCDU DCW DCWU DCDO SPACE FILL SETL
 syn match   armAssembler        "[a-zA-Z_][a-zA-Z0-9_]\+\s\+rout"
 syn match   armAssembler        "^[a-zA-Z0-9_]\+\s*$"
 syn match   armAssembler        "%[FB][AT][0-9]\([a-zA-Z0-9]\+\)\?"
 syn match   armAssembler        ":\(OR\|LOR\|AND\|LAND\|DEF\|LNOT\):"
+syn match   armAssembler        "{\(TRUE\|FALSE\)}"
 
 "pseudo instructions
 syn match armPseudoKeyword      "`\(ORG\|DW\|\DB\|DS\|EQU\|END\|BASE\)"
