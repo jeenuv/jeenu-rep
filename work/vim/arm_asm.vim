@@ -11,22 +11,19 @@ elseif exists("b:current_syntax")
         finish
 endif
 
-syn case match
-
-"identifiers
-"syn match armIdentifier        "[a-zA-Z][0-9a-zA-Z]*"
+syn case ignore
 
 "comments
 syn match armComment            ";.*$"
 
 "numbers
-syn match armNumber             "=[a-zA-Z][a-zA-Z0-9_]\+\>"
+syn match armNumber             "=\@<=[a-zA-Z][a-zA-Z0-9_]\+\>"
 syn match armNumber             "#[0-9]\+\>"
 syn match armNumber             "#\?0x[A-Fa-f0-9]\+\>"
 syn match armNumber             "#[a-zA-Z][a-zA-z0-9_]\+\>"
-syn match armNumber             "\<[0-9]\+\>"
-syn match armNumber             "[-+][0-9]\+\>"
-syn match armNumber             "[-+][0-9a-fA-F]\+\>"
+syn match armNumber             "\<-\?[0-9]\+\>"
+syn match armNumber             "\<-\?[0-9a-fA-F]\+\>"
+syn match armNumber             "\$[A-Za-z.0-9_]\+\>"
 
 syn match armString             "\"[^"]*\""
 
@@ -34,76 +31,73 @@ syn match armString             "\"[^"]*\""
 "syn match armOperator          "[(),\[\]{}!#<]"
 
 "conditional fields
-syn match armConditional        "\(eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)" contained
-syn match armConditional        "s\>" contained
+syn match armConditional        "\(eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\|s\)\>" contained
 
 "stack fields
-syn match armStack              "ia\|ib\|da\|db\|fa\|fd\|ea\|ed" contained
+syn keyword armStack              IA IB DA DB FA FD EA ED contained
 
 "length modifiers
-syn match armLenModif           "b\|sb\|h\|sh" contained
+syn keyword armLenModif           B SB H SH contained
 
-syn case ignore
 "
 "registers
-syn match armRegister           "\<[CRP][0-9]"
-syn match armRegister           "\<R1[0-5]"
-syn match armRegister           "\<P1[0-5]"
-syn keyword armRegister         LR PC SP CPSR SPSR
+syn match armRegister           "\<[CRP][0-9]\>"
+syn match armRegister           "\<[PR]1[0-5]\>"
+syn keyword armRegister         LR PC SP CPSR CPSR_C CPSR_CF SPSR
 
 
 "instructions
-syn match armMoveKeyword        "\<MOV\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armMoveKeyword        "\<MVN\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armMoveKeyword        "\<MRS\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\>" contains=armConditional
-syn match armMoveKeyword        "\<MSR\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\>" contains=armConditional
+syn match armMoveKeyword        "\<MOV\(..\)\?s\?\>" contains=armConditional
+syn match armMoveKeyword        "\<MVN\(..\)\?s\?\>" contains=armConditional
+syn match armMoveKeyword        "\<M\(RS\|SR\)\(..\)\?s\?\>" contains=armConditional
 
-syn match armArithmKeyword      "\<ADD\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armArithmKeyword      "\<ADC\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armArithmKeyword      "\<SUB\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armArithmKeyword      "\<SBC\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armArithmKeyword      "\<RSB\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armArithmKeyword      "\<RSC\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armArithmKeyword      "\<MUL\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armArithmKeyword      "\<MLA\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armArithmKeyword      "\<UMULL\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armArithmKeyword      "\<UMLAL\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armArithmKeyword      "\<SMULL\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armArithmKeyword      "\<SMLAL\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armArithmKeyword      "\<CLZ\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\>" contains=armConditional
+syn match armArithmKeyword      "\<ADD\(..\)\?s\?\>" contains=armConditional
+syn match armArithmKeyword      "\<ADC\(..\)\?s\?\>" contains=armConditional
+syn match armArithmKeyword      "\<SUB\(..\)\?s\?\>" contains=armConditional
+syn match armArithmKeyword      "\<SBC\(..\)\?s\?\>" contains=armConditional
+syn match armArithmKeyword      "\<RSB\(..\)\?s\?\>" contains=armConditional
+syn match armArithmKeyword      "\<RSC\(..\)\?s\?\>" contains=armConditional
+syn match armArithmKeyword      "\<MUL\(..\)\?s\?\>" contains=armConditional
+syn match armArithmKeyword      "\<MLA\(..\)\?s\?\>" contains=armConditional
+syn match armArithmKeyword      "\<UMULL\(..\)\?s\?\>" contains=armConditional
+syn match armArithmKeyword      "\<UMLAL\(..\)\?s\?\>" contains=armConditional
+syn match armArithmKeyword      "\<SMULL\(..\)\?s\?\>" contains=armConditional
+syn match armArithmKeyword      "\<SMLAL\(..\)\?s\?\>" contains=armConditional
+syn match armArithmKeyword      "\<CLZ\(..\)\?s\?\>" contains=armConditional
 
-syn match armLogicKeyword       "\<TST\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\>" contains=armConditional
-syn match armLogicKeyword       "\<TEQ\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\>" contains=armConditional
-syn match armLogicKeyword       "\<AND\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armLogicKeyword       "\<EOR\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armLogicKeyword       "\<ORR\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
-syn match armLogicKeyword       "\<BIC\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|s\)\>" contains=armConditional
+syn match armLogicKeyword       "\<TST\(..\)\?s\?\>" contains=armConditional
+syn match armLogicKeyword       "\<TEQ\(..\)\?s\?\>" contains=armConditional
+syn match armLogicKeyword       "\<AND\(..\)\?s\?\>" contains=armConditional
+syn match armLogicKeyword       "\<EOR\(..\)\?s\?\>" contains=armConditional
+syn match armLogicKeyword       "\<ORR\(..\)\?s\?\>" contains=armConditional
+syn match armLogicKeyword       "\<BIC\(..\)\?s\?\>" contains=armConditional
+syn match armLogicKeyword       "\<LS\(R\|L\)\(..\)\?s\?\>" contains=armConditional
 syn match armLogicKeyword       "\<NOP\>"
 
-syn match armCompareKeyword     "\<CMP\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\>" contains=armConditional
-syn match armCompareKeyword     "\<CMN\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\>" contains=armConditional
+syn match armCompareKeyword     "\<CMP\(..\)\?s\?\>" contains=armConditional
+syn match armCompareKeyword     "\<CMN\(..\)\?s\?\>" contains=armConditional
 
-syn match armBranchKeyword      "\<BL\?X\?\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\>" contains=armConditional
+syn match armBranchKeyword      "\<BL\?X\?\(..\)\?s\?\>" contains=armConditional
 
-syn match armLoadKeyword        "\<LDR\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|b\|sb\|h\|sh\)\>" contains=armConditional,armLenModif
-syn match armLoadMKeyword       "\<LDM\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(IA\|IB\|DA\|DB\|FD\|ED\|FA\|EA\)\>" contains=armConditional,armStack
+syn match armLoadKeyword        "\<LDR\(..\)\?s\?\>" contains=armConditional
+syn match armLoadMKeyword       "\<LDM\(..\)\?s\?\>" contains=armConditional
 
-syn match armStoreKeyword       "\<STR\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(\|b\|h\)\>" contains=armConditional,armLenModif
-syn match armStoreMKeyword      "\<STM\(\|eq\|ne\|cs\|hs\|cc\|lo\|mi\|pl\|vs\|vc\|hi\|ls\|ge\|lt\|gt\|le\|al\)\(IA\|IB\|DA\|DB\|FD\|ED\|FA\|EA\)\>" contains=armConditional,armStack
+syn match armStoreKeyword       "\<STR\(..\)\?s\?\>" contains=armConditional
+syn match armStoreMKeyword      "\<STM\(..\)\?s\?\>" contains=armConditional
 
-syn keyword armInstruction      HALT SWI MCR MRC LSL ASL LSR ASR ROR RRX SETCPSR SETSPSR GETCPSR ADR
+syn keyword armInstruction      HALT SWI MCR MRC ASL ASR ROR RRX SETCPSR SETSPSR GETCPSR
 
-syn keyword armAssembler        IF ELSE ENDIF MACRO MEND EXPORT IMPORT GBLL INCLUDE CODE READONLY ALIGN AREA END DCB DCD DCDU DCW DCWU DCDO SPACE FILL SETL
+syn keyword armAssembler        IF ELSE ENDIF MACRO MEND EXPORT IMPORT GBLL INCLUDE CODE READONLY ALIGN AREA END DCB DCD DCDU DCW DCWU DCDO SPACE FILL SETL SETA DWORD
 syn match   armAssembler        "[a-zA-Z_][a-zA-Z0-9_]\+\s\+rout"
 syn match   armAssembler        "^[a-zA-Z0-9_]\+\s*$"
 syn match   armAssembler        "%[FB][AT][0-9]\([a-zA-Z0-9]\+\)\?"
-syn match   armAssembler        ":\(OR\|LOR\|AND\|LAND\|DEF\|LNOT\):"
+syn match   armAssembler        ":\(L\?OR\|L\?AND\|DEF\|LNOT\):"
 syn match   armAssembler        "{\(TRUE\|FALSE\)}"
 
 "pseudo instructions
-syn match armPseudoKeyword      "`\(ORG\|DW\|\DB\|DS\|EQU\|END\|BASE\)"
-syn keyword armPseudoKeyword    DW DB DH
+syn keyword armPseudoKeyword    ORG DW DB DS EQU END BASE
 syn match armPseudoKeyword      "%[FB][AT][0-9]\([a-zA-Z0-9_]\+\)\?"
+syn match armPseudoKeyword      "\<ADRL\?\(..\)\?s\?\>" contains=armConditional
 
 
 syn case ignore
@@ -133,7 +127,7 @@ if version >= 508 || !exists("did_arm_syntax_inits")
         HiLink  armAsmKeyword           Statement
         HiLink  armConditional          Identifier
         HiLink  armLenModif             Special
-        HiLink  armStack                Special
+        HiLink  armStack                Identifier
         HiLink  armAssembler            Special
         HiLink  armComment              Comment
         HiLink  armPseudoKeyword        Special
