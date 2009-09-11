@@ -246,12 +246,12 @@ if has("autocmd")
             \   setf text |
             \ endif
 
-        " For all text files set 'textwidth' to 80 characters.
+        " For all text files set 'textwidth' to 78 characters.
         " Allow formatting of numbered/bulleted lists
         " I don't want comment leaders being inserted!
         autocmd FileType text
-                    \ setlocal textwidth=80 |
-                    \ set formatlistpat=^\\s*\\%(\\d\\+[]:.)}\\t\ ]\\\|[*ox-]\\)\\s* |
+                    \ setlocal textwidth=78 |
+                    \ set formatlistpat=^\\s*\\%([A-Za-z]\\\|[0-9]\\+\\)[]:.)}\\t\ ]\\s* |
                     \ set formatoptions=tn |
                     \ set comments= commentstring=
 
