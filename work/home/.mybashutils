@@ -246,3 +246,6 @@ function _bm_complete()
 complete -F _bm_complete go
 complete -F _bm_complete bm
 complete -o dirnames bmtemplate
+
+touch "$HOME/.book"
+bmprofile "$HOME/.book"

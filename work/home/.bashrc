@@ -206,8 +206,6 @@ fi
 
 # Bookmarking features
 [ -f "$HOME/.mybashutils" ] && source "$HOME/.mybashutils"
-# read all bookmarks
-bmprofile "$HOME/.book"
 
 # Get SVN completion
 if [ -f /etc/bash_completion.d/svn ]; then
