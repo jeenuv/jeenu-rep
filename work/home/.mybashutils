@@ -237,12 +237,13 @@ function _bm_complete()
     COMPREPLY=()
     CUR=${COMP_WORDS[$COMP_CWORD]}
 
-    if [ \( "${COMP_WORDS[0]}" = "go" -a "$COMP_CWORD" -eq 1 \) -o \( "${COMP_WORDS[0]}" = "bm" -a "$COMP_CWORD" -eq 2 \) ]; then
+    if [ \( "$COMP_CWORD" -gt 0 \) ]; then
         BKMS="$(for i in ${!bm_*}; do echo "${i#bm_}"; done)"
         COMPREPLY=($(compgen -W "$BKMS" $CUR))
     fi
 }
 
+export -f _bm_complete
 complete -F _bm_complete go
 complete -F _bm_complete bm
 complete -o dirnames bmtemplate
