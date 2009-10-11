@@ -18,13 +18,13 @@ function bmread()
     fi
 
     # Sanity check
-    if [ "$(cat "$PROFILE_BM" | sed '1q')" != "#BOOKMARK" ]; then
+    if [ "$(sed '1q' "$PROFILE_BM")" != "#BOOKMARK" ]; then
         echo "bmread: Invalid bookmark profile"
         return 1
     fi
 
     # Check for templated file
-    if cat "$PROFILE_BM" | grep -q '\$TEMPLATE_BM'; then
+    if grep -q '\$TEMPLATE_BM' "$PROFILE_BM"; then
         # If it's templated, check for $TEMPLATE_BM
         bmtemplate
         if ! confirm "$question"; then
