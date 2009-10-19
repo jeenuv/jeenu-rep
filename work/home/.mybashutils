@@ -91,7 +91,7 @@ function bm()
 
         if [ -n "$(eval echo \${bm_$1})" ]; then
             # if bookmark is already defined
-            REPLY=
+            unset REPLY
             if confirm "bm: Bookmark '$1' already defined. overwrite?"; then
                 export bm_$1="$(pwd -P)"
                 CHANGED_BM=1
@@ -234,7 +234,7 @@ function bmtemplate()
         return
     elif [ -z "$1" ]; then
         echo "bmtemplate: Bookmark template unset"
-        TEMPLATE_BM=
+        unset TEMPLATE_BM
     else
         export TEMPLATE_BM="$1"
         if [ "${1:0:1}" != "/" ]; then
