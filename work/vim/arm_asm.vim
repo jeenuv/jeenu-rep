@@ -87,7 +87,7 @@ syn match armStoreMKeyword      "\<STM\(..\)\?s\?\>" contains=armConditional
 
 syn keyword armInstruction      HALT SWI MCR MRC ASL ASR ROR RRX SETCPSR SETSPSR GETCPSR
 
-syn keyword armAssembler        IF ELSE ENDIF MACRO MEND EXPORT IMPORT GBLL INCLUDE CODE READONLY ALIGN AREA END DCB DCD DCDU DCW DCWU DCDO SPACE FILL SETL SETA DWORD
+syn keyword armAssembler        IF ELIF ELSE ENDIF MACRO MEND EXPORT IMPORT GBLL INCLUDE CODE READONLY ALIGN AREA END DCB DCD DCDU DCW DCWU DCDO SPACE FILL SETL SETA DWORD
 syn match   armAssembler        "[a-zA-Z_][a-zA-Z0-9_]\+\s\+rout"
 syn match   armAssembler        "^[a-zA-Z0-9_]\+\s*$"
 syn match   armAssembler        "%[FB][AT][0-9]\([a-zA-Z0-9]\+\)\?"
