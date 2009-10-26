@@ -42,7 +42,7 @@ syn keyword armLenModif           B SB H SH contained
 "
 "registers
 syn match armRegister           "\<[CRP][0-9]\>"
-syn match armRegister           "\<[PR]1[0-5]\>"
+syn match armRegister           "\<[CRP]1[0-5]\>"
 syn keyword armRegister         LR PC SP CPSR CPSR_C CPSR_CF SPSR
 
 
