@@ -24,6 +24,7 @@ syn match armNumber             "#[a-zA-Z][a-zA-z0-9_]\+\>"
 syn match armNumber             "\<-\?[0-9]\+\>"
 syn match armNumber             "\<-\?[0-9a-fA-F]\+\>"
 syn match armNumber             "\$[A-Za-z.0-9_]\+\>"
+syn match armNumber             "|[^|]\+|"
 
 syn match armString             "\"[^"]*\""
 
