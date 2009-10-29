@@ -284,7 +284,9 @@ fi
 
 # My own SVN utilities
 [ -f "$HOME/.mysvnutils" ] && source "$HOME/.mysvnutils"
-unset svn_sourced
+
+# My own GIT utilities
+[ -f "$HOME/.mygitutils" ] && source "$HOME/.mygitutils"
 
 # Set colors for 'ls'
 [ "$TERM" != "dump" ] && eval "$(dircolors -b)"

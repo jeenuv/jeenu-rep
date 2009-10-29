@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# To list all git modified items in the given directory
+function gitmodified()
+{
+    git diff --diff-filter=M --name-only $@
+}
+
+# Recursively show diffs for all the modified files
+function gitshowdiffs()
+{
+    local i
+    local git_patch_file="$HOME/tmp/gitpatchfile"
+
+    for i in $(gitmodified $@); do
+        # prompt for continue
+        REPLY= read -n1 -p "$i: continue (n/q)? "
+        if [ "$REPLY" = "n" -o "$REPLY" = "N" ]; then
+            echo
+            continue
+        elif [ "$REPLY" = "q" -o "$REPLY" = "Q" ]; then
+            echo
+            return
+        fi
+
+        echo " getting diff..."
+        git diff --no-prefix "$i" > "$git_patch_file" || return
+
+        if [ "$(stat -c %s "$git_patch_file")" -eq 0 ]; then
+            echo "gitshowdiffs: $i: no diff found"
+            continue
+        else
+            vim -n '+set patchexpr=MyPatch()' \
+                   "+leftabove vertical diffpatch $git_patch_file |cmap q qa|nmap <F7> ]c|nmap <F6> [c|windo set fdm=diff|normal gg" \
+            "$i"
+        fi
+    done
+}

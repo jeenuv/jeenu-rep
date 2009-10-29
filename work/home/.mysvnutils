@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Remove ':' as we need it for URL completion
-COMP_WORDBREAKS=${COMP_WORDBREAKS//:}
-
 # To list all SVN modified items in the given directory
 function svnmodified()
 {
@@ -13,11 +10,11 @@ function svnmodified()
 function svnshowdiffs()
 {
     local i
+    local svn_patch_file="$HOME/tmp/svnpatchfile"
 
     for i in $(svnmodified $@); do
         # prompt for continue
-        REPLY=
-        read -n1 -p "$i: continue (n/q)? "
+        REPLY= read -n1 -p "$i: continue (n/q)? "
         if [ "$REPLY" = "n" -o "$REPLY" = "N" ]; then
             echo
             continue
@@ -26,9 +23,17 @@ function svnshowdiffs()
             return
         fi
 
-        # showbasediff lies in netrep/scripts
-        echo
-        showbasediff $i
+        echo " getting diff..."
+        svn diff "$i" > "$svn_patch_file" || continue
+
+        if [ "$(stat -c %s "$svn_patch_file")" -eq 0 ]; then
+            echo "svnshowdiffs: $i: no diff found"
+            continue
+        else
+            vim -n '+set patchexpr=MyPatch()' \
+                   "+leftabove vertical diffpatch $svn_patch_file |cmap q qa|nmap <F7> ]c|nmap <F6> [c|windo set fdm=diff|normal gg" \
+            "$i"
+        fi
     done
 }
 
@@ -43,67 +48,3 @@ function svngetreproot()
 {
     svn info $@ | awk '/Root:/{print $3}'
 }
-
-# If SVN completion hasn't been sourced yet
-if [ -z "$svn_sourced" ]; then
-    _Svn_Command='add blame cat checkout co cleanup commit ci copy cp delete remove rm diff export help ? import info list ls lock log
-    merge mergeinfo mkdir move mv rename propdel pd propedit pedit pe propget pget pg proplist plist pl propset pset ps resolved revert status
-    switch unlock update --version'
-
-    _Svn_Options='--stop-on-copy --config-dir --dry-run --recursive --limit --no-ignore --ignore-eol-style --ignore-ancestry --diff-cmd'
-
-    # Perform completion for svn commands
-    function _svn_complete()
-    {
-        local CUR
-        local svn_output
-        local svn_url_completed_part
-        local svn_url_uncompleted_part
-
-        COMPREPLY=()
-        CUR=${COMP_WORDS[$COMP_CWORD]}
-        if [[ $COMP_CWORD -eq 1 ]]; then
-            COMPREPLY=($(compgen -W "${_Svn_Command}" -- $CUR))
-        else
-            if [[ ${COMP_WORDS[$COMP_CWORD - 1]} == "help" || ${COMP_WORDS[$COMP_CWORD - 1]} == "?" ]]; then
-                COMPREPLY=($(compgen -W "${_Svn_Command}" $CUR))
-                return
-            elif [[ ${CUR:0:2} == '--' ]]; then
-                COMPREPLY=($(compgen -W "${_Svn_Options}" -- $CUR))
-                return
-            elif [[ ${CUR:0:1} == '$' ]]; then
-                if [[ ${CUR:0:2} == '$(' ]]; then
-                    return
-                elif [[ ${CUR: -1:1} == "/" ]]; then
-                    CUR=${CUR#$}
-                    CUR=${CUR%/}
-                    COMPREPLY=($(eval "echo \$$CUR"))
-                    return
-                else
-                    COMPREPLY=($(compgen -P '$' -v ${CUR#$}))
-                    return
-                fi
-            else
-                # Check if it's a URL
-                echo $CUR | egrep '^(http|svn)://' >/dev/null 2>&1
-                [[ $? -ne 0 ]] && return
-
-                if [[ ${CUR: -1:1} == "/" ]]; then
-                    svn_url_completed_part=$CUR
-                    svn_url_uncompleted_part=${CUR#$svn_url_completed_part/}
-
-                    svn_output=$(svn ls "$svn_url_completed_part" 2>&1 | sed '/^svn:/d')
-                    COMPREPLY=($(compgen -P "${svn_url_completed_part}" -W "$svn_output"))
-                else
-                    svn_url_completed_part=${CUR%/*}
-                    svn_url_uncompleted_part=${CUR#$svn_url_completed_part/}
-
-                    svn_output=$(svn ls "$svn_url_completed_part" 2>&1 | sed '/^svn:/d')
-                    COMPREPLY=($(compgen -P "${svn_url_completed_part}/" -W "$svn_output" "$svn_url_uncompleted_part"))
-                fi
-            fi
-        fi
-    }
-
-    complete -o default -F _svn_complete svn
-fi

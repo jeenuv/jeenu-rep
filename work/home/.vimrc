@@ -690,12 +690,11 @@ function! InsertTimestamp(count) range
     endif
 endfunction
 
-" To generage patch for SVN. This is used in SVNBaseDiff command as well as
-" showbasediff shell script too. The --binary option was added for DOS files.
-" Patch ignores and strips the ^M's in diff output from DOS files and hence
-" such patches would fail. The manual says this options wouldn't have any
-" effect in POSIX comliant systems and hence is harmless when use in other
-" situations
+" To generage patch for SVN. This is used in SVNBaseDiff The --binary option
+" was added for DOS files.  Patch ignores and strips the ^M's in diff output
+" from DOS files and hence such patches would fail. The manual says this
+" options wouldn't have any effect in POSIX comliant systems and hence is
+" harmless when use in other situations
 function MyPatch()
     call system("patch --binary -Ro " . escape(v:fname_out, ' \') . " " . escape(v:fname_in, ' \') . " < " .  escape(v:fname_diff, ' \'))
 endfunction
