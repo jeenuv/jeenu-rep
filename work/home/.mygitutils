@@ -12,6 +12,9 @@ function gitshowdiffs()
     local i
     local git_patch_file="$HOME/tmp/gitpatchfile"
 
+    # Make sure we're in a git working tree
+    git rev-parse || return 1
+
     for i in $(gitmodified $@); do
         # prompt for continue
         REPLY= read -n1 -p "$i: continue (n/q)? "
