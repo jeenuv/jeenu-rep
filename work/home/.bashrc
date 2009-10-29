@@ -31,7 +31,7 @@ alias D="sed 's/^\(Index\|---\|+++\).*/[1;32m&[0m/;s/^-.*/[1;35m&[0m/;s/^+.*
 
 # This is supposed to be used after a '|' from shell
 alias G='grep -nHI --exclude=\*.svn-base'
-alias Q="grep -v .svn/ > ~/tmp/errors && env -u DISPLAY vim -q ~/tmp/errors"
+alias Q='grep -v .svn/ > ~/tmp/errors && env -u DISPLAY vim "+SetNavChoice c" "+cfile ~/tmp/errors"'
 
 ###########################
 ####  Shell Variables  ####
