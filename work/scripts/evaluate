@@ -1,12 +1,15 @@
 #!/bin/bash
 
 usage="\
-Usage: evaluate [-xo] expression [expression [...]]
-    -x      Print result in hex
-    -o      Print result in octal
+Usage: evaluate [-xo] [-b [-w <width>] [-f <field-width>]] expression [expression [...]]
+    -x                Print result in hex
+    -o                Print result in octal
+    -b                Print result in binary
+    -w <width>        Extend binary output to <width>
+    -f <field-width>  Split binary into <field>
 Results are printed in decimal by default"
 
-ARGS="$(getopt -o "xo" -- "$@")"
+ARGS="$(getopt -o "xobw:f:" -- "$@")"
 if [ $? -ne 0 ]; then
     echo "$usage"
     exit 1
@@ -15,6 +18,9 @@ fi
 eval set -- "$ARGS"
 
 f=d
+width=32
+field=4
+
 until [ -z "$*" ]; do
     case "$1" in
         -x)
@@ -23,6 +29,20 @@ until [ -z "$*" ]; do
 
         -o)
         f=o
+        ;;
+
+        -b)
+        f=b
+        ;;
+
+        -w)
+        shift
+        width="$1"
+        ;;
+
+        -f)
+        shift
+        field="$1"
         ;;
 
         --)
@@ -40,6 +60,30 @@ if [ -z "$*" ]; then
 fi
 
 for i; do
-    let "x = $i"
-    eval "printf \"\$i = %#$f\\n\" \"\$x\""
+    let "x = $i" || exit 1
+    if [ "$f" != b ]; then
+        eval "printf \"\$i = %#$f\\n\" \"\$x\""
+    else
+        b="$(echo "obase=2;$x" | bc | awk -v f="$field" -v w="$width" '
+        {
+            num=$0
+            n=length(num)
+            if(n<w){
+                for(i=0;i<(w-n);i++){
+                    z=z"0"
+                }
+                num= "" z "" num
+                n=w
+            }
+            n=split(num,val,"")
+            for(i=n;i>=1;i--){
+                revstr=val[i] revstr
+                if(((n-i+1)%f)==0)
+                    revstr=" " revstr
+            }
+            print revstr
+        }')"
+        [ $? -ne 0 ] && exit 1
+        printf "$i = %s\n" "$b"
+    fi
 done
