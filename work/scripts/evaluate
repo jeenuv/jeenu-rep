@@ -59,8 +59,9 @@ if [ -z "$*" ]; then
     exit 1
 fi
 
+set -x
 for i; do
-    let "x = $i" || exit 1
+    let "x = $i"
     if [ "$f" != b ]; then
         eval "printf \"\$i = %#$f\\n\" \"\$x\""
     else
