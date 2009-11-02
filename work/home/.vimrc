@@ -81,6 +81,9 @@ set tabline=%!MakeTabLine()
 " I want to use mouse everywhere
 set mouse=a
 
+" Don't litter swp files
+set updatecount=0
+
 " If running under Cygwin, we need to add \ to file name characters
 if $PATH =~? "/cygdrive"
     set isf+=\\
