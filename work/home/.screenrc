@@ -26,3 +26,5 @@ defscrollback 5000
 
 # Ignore case when performing search
 ignorecase on
+
+source $HOME/.screenrc.local
