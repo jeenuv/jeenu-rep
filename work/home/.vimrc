@@ -291,21 +291,13 @@ endif
 command! TruncW :%s/\s\+$//ce |
 
 " For doing an SVN diff on the BASE version from within Vim
-command! SVNBaseDiff   execute "!svn diff % > ~/tmp/patchfile"|
-                     \ set patchexpr=MyPatch()|
-                     \ vert diffp ~/tmp/patchfile|
-                     \ windo set fdm=diff|
-                     \ set patchexpr&|
-                     \ wincmd p
+command! SVNBaseDiff execute "!svn diff % > ~/tmp/patchfile"|
+                    \ call DoMyDiff()
 
 " For doing a Git diff within Vim. Need the --cached option because index is populated
 " already, without which git diff will give empty output
 command! GitDiff execute "!git diff --cached -p --no-prefix --no-ext-diff -- % > ~/tmp/patchfile"|
-                     \ set patchexpr=MyPatch()|
-                     \ vert diffp ~/tmp/patchfile|
-                     \ windo set fdm=diff|
-                     \ set patchexpr&|
-                     \ wincmd p
+                    \ call DoMyDiff()
 
 " Command for entering navigation choice
 command! -nargs=? SetNavChoice call GetNPNavigatonChoiceFromUser("<args>")
@@ -337,6 +329,16 @@ endif
 " ****************************************************
 " ****************** FUNCTIONS ***********************
 " ****************************************************
+
+" Common diff code
+function DoMyDiff()
+    set patchexpr=MyPatch()                  " Custom patching ;D
+    vert diffp ~/tmp/patchfile
+    windo set fdm=diff
+    set patchexpr&
+    autocmd BufWinLeave <buffer> diffoff     " Saves me a manual diffoff
+    wincmd p                                 " Go to the actual buffer
+endfunction
 
 "Convert tabs to spaces
 function TabsToSpace()
