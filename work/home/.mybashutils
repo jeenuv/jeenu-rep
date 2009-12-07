@@ -43,9 +43,11 @@ function bmread()
 
     # Check for templated file
     if grep -q '\$TEMPLATE_BM' "$PROFILE_BM"; then
-        # If it's templated, check for $TEMPLATE_BM
+        # If it's templated, print it out for user info
         bmtemplate
-        if ! confirm "$question"; then
+        # Bug the user wit this question only if he's executing from
+        # the command line. Else, just assume it's OK
+        if [ "${#FUNCNAME[*]}" -eq 0 ] && ! confirm "$question"; then
             return 1
         fi
     fi
