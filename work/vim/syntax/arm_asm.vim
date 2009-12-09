@@ -1,10 +1,4 @@
-" Vim syntax file
-" Language:     ARM assembler
-" Maintainer:   Goran Jakovljevic <goran.jakovljevic@fer.hr>
-" Last Change:  2002 May 15
 
-" For version 5.x: Clear all syntax items
-" For version 6.x: Quit when a syntax file was already loaded
 if version < 600
         syntax clear
 elseif exists("b:current_syntax")
@@ -140,5 +134,3 @@ if version >= 508 || !exists("did_arm_syntax_inits")
 endif
 
 let b:current_syntax = "arm"
-
-" vim: ts=8
