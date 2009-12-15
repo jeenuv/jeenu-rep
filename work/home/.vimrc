@@ -384,22 +384,22 @@ function! GetNPNavigatonChoiceFromUser(...)
         let choice = a:1
     endif
 
-    if choice ==? "p" || choice == 1
+    if choice ==? "p"
         nmap <C-N> <C-F>
         nmap <C-P> <C-B>
 
         silent! nunmap g<C-N>
         silent! nunmap g<C-P>
-    elseif choice ==? "t" || choice == 2
+    elseif choice ==? "t"
         if v:version >= 700
             " Tab's were added after 700
             " tabnext does't accept a count, I've to work this around
             nmap <C-N>  :<C-U>
-                        \let g:J_count = v:count1<bar>
-                        \while g:J_count > 0<bar>
-                        \    tabnext<bar>
-                        \    let g:J_count -= 1<bar>
-                        \endwhile<CR>
+                        \ let g:J_count = v:count1<bar>
+                        \ while g:J_count > 0<bar>
+                        \     tabnext<bar>
+                        \     let g:J_count -= 1<bar>
+                        \ endwhile<CR>
             nmap <C-P> :<C-U>execute "tabprevious " . v:count1<CR>
         else
             silent! nunmap <C-N>
@@ -408,35 +408,35 @@ function! GetNPNavigatonChoiceFromUser(...)
 
         silent! nunmap g<C-N>
         silent! nunmap g<C-P>
-    elseif choice ==? "c" || choice == 3
+    elseif choice ==? "c"
         " Navigate error list
         nmap <C-N> :<C-U>execute "keepju " . v:count . "cnext"<CR>
         nmap <C-P> :<C-U>execute "keepju " . v:count . "cprevious"<CR>
 
         nmap g<C-N> :<C-U>execute v:count . "cnewer"<CR>
         nmap g<C-P> :<C-U>execute v:count . "colder"<CR>
-    elseif choice ==? "l" || choice == 4
+    elseif choice ==? "l"
         " Navigate location list
         nmap <C-N> :<C-U>execute "keepju " . v:count . "lnext"<CR>
         nmap <C-P> :<C-U>execute "keepju " . v:count . "lprevious"<CR>
 
         nmap g<C-N> :<C-U>execute v:count . "lnewer"<CR>
         nmap g<C-P> :<C-U>execute v:count . "lolder"<CR>
-    elseif choice ==? "d" || choice == 5
+    elseif choice ==? "d"
         " Navigate diffs in file
         nmap <C-N> ]c
         nmap <C-P> [c
 
         silent! nunmap g<C-N>
         silent! nunmap g<C-P>
-    elseif choice ==? "a" || choice == 6
+    elseif choice ==? "a"
         " Navigate arguments
         nmap <C-N> :next<CR>
         nmap <C-P> :previous<CR>
 
         silent! nunmap g<C-N>
         silent! nunmap g<C-P>
-    elseif choice ==? "g" || choice == 7
+    elseif choice ==? "g"
         " Navigate tags
         nmap <C-N> :tn<CR>
         nmap <C-P> :tp<CR>
