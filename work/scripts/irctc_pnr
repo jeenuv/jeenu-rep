@@ -1,0 +1,14 @@
+#!/bin/bash
+
+until [ -z "$*" ]; do
+    if [ -z "$1" -o "${#1}" -ne 10 ]; then
+        echo "Usage: irctc_pnr PNR_NUMBER"
+        exit 1
+    fi
+
+    pnr_number=$(echo "$1" | sed 's/^\([0-9]\{3\}\)\([0-9]\{7\}\)$/lccp_pnrno1=\1\&lccp_pnrno2=\2/')
+    echo "$1: "
+    wget -q -O - --post-data="$pnr_number" http://www.indianrail.gov.in/cgi_bin/inet_pnrstat_cgi.cgi |
+        sed -n '/Passenger\s\+[1-6]/{N;N;s/<[^>]\+>//g;s/\n/ \t| /g;s/^/\t/p}'
+    shift
+done
