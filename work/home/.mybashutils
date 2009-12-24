@@ -268,5 +268,7 @@ complete -F _bm_complete go
 complete -F _bm_complete bm
 complete -o dirnames bmtemplate
 
-touch "$HOME/.book"
+if [ ! -f "$HOME/.book" ]; then
+    echo "#BOOKMARK" > "$HOME/.book"
+fi
 bmprofile "$HOME/.book"
