@@ -276,10 +276,9 @@ fi
 # Bookmarking features
 [ -f "$HOME/.mybashutils" ] && source "$HOME/.mybashutils"
 
-# Get SVN completion
-if [ -f /etc/bash_completion.d/svn ]; then
-    source /etc/bash_completion.d/svn
-    svn_sourced=yes
+# Get all available BASH completion
+if [ -f /etc/bash_completion ]; then
+    source /etc/bash_completion
 fi
 
 # My own SVN utilities
