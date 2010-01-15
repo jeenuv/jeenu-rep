@@ -1,2 +1,21 @@
 bind generic g move-first-line
-bind generic G move-last-line
+
+bind main G move-last-line
+bind diff G move-last-line
+bind log G move-last-line
+bind help G move-last-line
+bind pager G move-last-line
+bind status G move-last-line
+bind stage G move-last-line
+
+bind main v toggle-rev-graph
+
+bind generic e scroll-line-down
+bind generic y scroll-line-up
+
+set line-graphics = no
+set show-rev-graph = yes
+
+color cursor black white
+color diff-header white white bold
+color diff-index default default dim
