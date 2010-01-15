@@ -18,7 +18,8 @@ syn keyword mmpStorage lang library linkas nostrictdef option option_replace
 syn keyword mmpStorage resource source sourcepath srcdbg startbitmap
 syn keyword mmpStorage start end staticlibrary strictdepend systeminclude
 syn keyword mmpStorage systemresource target targettype targetpath uid
-syn keyword mmpStorage userinclude win32_library
+syn keyword mmpStorage userinclude win32_library capability epocallowdlldata exportlibrary
+syn keyword mmpStorage smpsafe firstlib
 
 syn match mmpIfdef "^\s*#\(include\|ifdef\|ifndef\|if\|endif\|else\|elif\|define\).*$" contains=mmpComment
 syn match mmpMacro "^\s*macro.*$" contains=mmpComment
