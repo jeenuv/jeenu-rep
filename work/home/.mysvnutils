@@ -23,7 +23,8 @@ function svnshowdiffs()
             return
         fi
 
-        echo " getting diff..."
+        # With control character to clear the entire line
+        echo -e "\r\e[2Kgetting diff..."
         svn diff "$i" > "$svn_patch_file" || continue
 
         if [ "$(stat -c %s "$svn_patch_file")" -eq 0 ]; then

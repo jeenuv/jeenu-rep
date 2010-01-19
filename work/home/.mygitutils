@@ -27,7 +27,8 @@ function gitshowdiffs()
             return
         fi
 
-        echo " getting diff..."
+        # With control character to clear the entire line
+        echo -e "\r\e[2Kgetting diff..."
         git diff --no-prefix --no-ext-diff "$i" > "$git_patch_file" || return
 
         if [ "$(stat -c %s "$git_patch_file")" -eq 0 ]; then
