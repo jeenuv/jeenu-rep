@@ -6,23 +6,35 @@ CHANGED_BM=0
 # Default bookmark profile
 PROFILE_BM="$HOME/.book"
 
-# Funtion to ask y/n questions. We need to define this if only not already defined
-if ! type confirm &>/dev/null; then
-    function confirm()
-    {
-        if [ -z "$*" ]; then
-            return 1
-        fi
+# Funtion to ask y/n questions
+function confirm()
+{
+    CONFIRMED=
+    REPLY=
 
-        echo -n "${PROGNAME+$PROGNAME: }$1 (y/n) "
+    if [ -z "$*" ]; then
+        return 1
+    fi
+
+    echo -ne "\r\e[2K${PROGNAME:+$PROGNAME: }$1 (y/n/q) "
+    if [ -z "$2" ]; then
         read
-        if [ "$REPLY" = "y" -o "$REPLY" = "Y" ]; then
-            return 0
-        else
-            return 1
-        fi
-    }
-fi
+    else
+        read -n "$2"
+    fi
+
+    if [ "$REPLY" = "n" -o "$REPLY" = "N" ]; then
+        CONFIRMED="no"
+        return 1
+    elif [ "$REPLY" = "q" -o "$REPLY" = "Q" ]; then
+        CONFIRMED="quit"
+        return 1
+    else
+        CONFIRMED="yes"
+        return 0
+    fi
+}
+export -f confirm
 
 # Read the bookmarks
 function bmread()

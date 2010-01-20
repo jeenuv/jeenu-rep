@@ -18,13 +18,14 @@ function gitshowdiffs()
     cd "$git_dir/.."
     for i in $(gitmodified "$@"); do
         # prompt for continue
-        read -n1 -p "$i: continue (n/q)? "
-        if [ "$REPLY" = "n" -o "$REPLY" = "N" ]; then
-            echo
-            continue
-        elif [ "$REPLY" = "q" -o "$REPLY" = "Q" ]; then
-            echo
-            return
+        if ! confirm "$i: continue" 1; then
+            if [ "$CONFIRMED" = "no" ]; then
+                echo
+                continue
+            elif [ "$CONFIRMED" = "quit" ]; then
+                echo
+                return
+            fi
         fi
 
         # With control character to clear the entire line
@@ -35,7 +36,7 @@ function gitshowdiffs()
             echo "gitshowdiffs: $i: no diff found"
             continue
         else
-            vim -n '+set patchexpr=MyPatch()' \
+            DISPLAY= vi -n '+set patchexpr=MyPatch()' \
                    "+leftabove vertical diffpatch $git_patch_file |cmap q qa|nmap <F7> ]c|nmap <F6> [c|windo set fdm=diff nolist|normal gg" \
             "$i"
         fi

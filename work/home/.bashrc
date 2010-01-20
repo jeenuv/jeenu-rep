@@ -84,23 +84,6 @@ function launch()
     eval "$ARG_LIST &>/dev/null &"
 }
 
-# Funtion to ask y/n questions
-function confirm()
-{
-    if [ -z "$*" ]; then
-        return 1
-    fi
-
-    echo -n "${PROGNAME+$PROGNAME: }$1 (y/n) "
-    read
-    if [ "$REPLY" = "y" -o "$REPLY" = "Y" ]; then
-        return 0
-    else
-        return 1
-    fi
-}
-export -f confirm
-
 # Function to go up in the directory; level is specified as argument
 function up()
 {
