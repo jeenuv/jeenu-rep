@@ -54,7 +54,14 @@ HISTSIZE=1000
 
 # Histroy control
 HISTCONTROL=ignorespace:ignoredups:erasedups
-HISTIGNORE='mplayer*'
+
+# Processing for setting up less
+if [ -z "$LESSOPEN" ]; then
+    # Cygwin might have lesspipe.sh
+    less_proc_path="$(which lesspipe 2>/dev/null)" || less_proc_path="$(which lesspipe.sh 2>/dev/null)"
+    eval "$less_proc_path"
+    unset less_proc_path
+fi
 
 # Create a tmp directory
 if [ ! -d ~/tmp ]; then
