@@ -161,7 +161,8 @@ nmap <F8> <C-W>g}|              " Look up the tag in the preview window
 nmap <F2> :ls<CR>:b|            " Lists the open buffers
 nmap K <NOP>|                   " Get rid of the annoying man page lookup
 
-nnoremap <C-L> <C-L>:noh<CR>|   " Kinda refresh
+" Kinda refresh
+nnoremap <C-L> :noh\|if &diff\|diffupdate\|endif<CR><C-L>
 
 " Process when Enter Key is pressed
 nmap <CR> :call OnReturnKey()<CR>:echo<CR>|
