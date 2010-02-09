@@ -274,7 +274,7 @@ if has("autocmd")
         autocmd BufNew,BufEnter *.gmk,*.make setf make
 
         " Auto commands for C files to set tw to 100
-        autocmd BufNew,BufEnter *.[ch],*.[ch][xp][xp] set textwidth=100
+        autocmd BufNew,BufEnter *.[ch],*.[ch][xp][xp],*.vim set textwidth=100
 
         " Auto command helpers for switching to alternate tabs
         if v:version >= 700
