@@ -255,7 +255,7 @@ if has("autocmd")
         " I don't want comment leaders being inserted!
         autocmd FileType text
                     \ setlocal textwidth=78 |
-                    \ set formatlistpat=^\\s*\\%([A-Za-z]\\\|[0-9]\\+\\)[]:.)}\\t\ ]\\s* |
+                    \ set formatlistpat=^\\s*\\%([A-Za-z]\\\|[0-9]\\+\\\|[*-]\\)[]:.)}\\t\ ]\\s* |
                     \ set formatoptions=tn |
                     \ set comments= commentstring=
 
