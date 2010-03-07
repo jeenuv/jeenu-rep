@@ -78,6 +78,9 @@ set runtimepath+=~/.vim
 " Make tab lines in my way!
 set tabline=%!MakeTabLine()
 
+" Custom status line for windows. No more fumbling for window number
+set statusline=[%{winnr()}]\ %t\ %h\ %r%=%l,%c%V\ %4p%%
+
 " I want to use mouse everywhere
 set mouse=a
 
