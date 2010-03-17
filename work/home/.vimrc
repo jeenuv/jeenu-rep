@@ -258,7 +258,7 @@ if has("autocmd")
         " I don't want comment leaders being inserted!
         autocmd FileType text
                     \ setlocal textwidth=78 |
-                    \ set formatlistpat=^\\s*\\%([A-Za-z]\\\|[0-9]\\+\\\|[*-]\\)[]:.)}\\t\ ]\\s* |
+                    \ set formatlistpat=^\\s\\+(\\?\\%([a-z0-9]\\+\\\|[-*+]\\)[:.)]\\?\\s\\+ |
                     \ set formatoptions=tn |
                     \ set comments= commentstring=
 
@@ -639,7 +639,7 @@ function! AlignVert(direction) range
         for i in range(cur_start[1], cur_end[1])
             normal dwj
         endfor
-    elseif a:direction ==? "r"
+    else
         let shift = input("Shift from start of line (y/n)? ", "n")
         if shift !=? "n" && shift !=? "y"
             echo "Invalid input"
