@@ -258,9 +258,9 @@ if has("autocmd")
         " I don't want comment leaders being inserted!
         autocmd FileType text
                     \ setlocal textwidth=78 |
-                    \ set formatlistpat=^\\s\\+(\\?\\%([a-z0-9]\\+\\\|[-*+]\\)[:.)]\\?\\s\\+ |
-                    \ set formatoptions=tn |
-                    \ set comments= commentstring=
+                    \ setlocal formatlistpat=^\\s*\\%(\\%((\\?\\%([A-Z]\\\|[a-z]\\+\\\|\\d\\+\\)\\)[:.)]\\\|[-*+]\\)\\s\\+ |
+                    \ setlocal formatoptions=tn |
+                    \ setlocal comments= commentstring=
 
         " When editing a file, always jump to the last known cursor position.
         " Don't do it when the position is invalid or when inside an event handler
