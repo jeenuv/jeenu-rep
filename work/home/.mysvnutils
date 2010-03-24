@@ -32,7 +32,7 @@ function svnshowdiffs()
             echo "svnshowdiffs: $i: no diff found"
             continue
         else
-            DISPLAY= vi -n '+set patchexpr=MyPatch()' \
+            DISPLAY= vim -n '+set patchexpr=MyPatch()' \
                    "+leftabove vertical diffpatch $svn_patch_file |cmap q qa|nmap <F7> ]c|nmap <F6> [c|windo set fdm=diff|normal gg" \
             "$i"
         fi

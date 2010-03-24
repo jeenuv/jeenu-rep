@@ -36,7 +36,7 @@ function gitshowdiffs()
             echo "gitshowdiffs: $i: no diff found"
             continue
         else
-            DISPLAY= vi -n '+set patchexpr=MyPatch()' \
+            DISPLAY= vim -n '+set patchexpr=MyPatch()' \
                    "+leftabove vertical diffpatch $git_patch_file |cmap q qa|nmap <F7> ]c|nmap <F6> [c|windo set fdm=diff nolist|normal gg" \
             "$i"
         fi
