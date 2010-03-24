@@ -215,10 +215,10 @@ cmap <C-X> <Right>
 
 " Search using visual selection
 vmap * y/\<<C-R>=escape('<C-R>"', '$.*/~[]\')<CR>\><CR>
-vmap # y?\<<C-R>=escape('<C-R>"', '$.*/?~[]\')<CR>\><CR>
+vmap # y?\<<C-R>=escape('<C-R>"', '$.*/~[]\')<CR>\><CR>
 
 vmap g* y/<C-R>=escape('<C-R>"', '$.*/~[]\')<CR><CR>
-vmap g# y?<C-R>=escape('<C-R>"', '$.*/?~[]\')<CR><CR>
+vmap g# y?<C-R>=escape('<C-R>"', '$.*/~[]\')<CR><CR>
 
 " Wrap selection with selected character
 vmap \w :call GetWrapperChoiceFromUser()<CR>
