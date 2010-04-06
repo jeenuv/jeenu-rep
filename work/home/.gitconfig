@@ -12,6 +12,7 @@
 	og = log --pretty=oneline --abbrev-commit --all --graph
 	flog = log --first-parent --pretty=oneline --abbrev-commit
 	oshow = show --pretty=oneline
+	diffc = diff --cached
 [color]
 	diff = auto
 	status = true
