@@ -1,14 +1,35 @@
 #!/bin/bash
 
-until [ -z "$*" ]; do
-    if [ -z "$1" -o "${#1}" -ne 10 ]; then
+temp_file=$(mktemp) || exit
+rc_file="$HOME/.irctc_pnr"
+
+if [ -z "$1" ]; then
+    if [ -f "$rc_file" ]; then
+        # launch myself with contents of $rc_file as arguments
+        exec $0 $(xargs < "$rc_file")
+    else
         echo "Usage: irctc_pnr PNR_NUMBER"
         exit 1
     fi
+fi
+
+until [ -z "$*" ]; do
+    if [ "${#1}" -ne 10 ]; then
+        echo "irctc_pnr: Invalid PNR: $1"
+        continue
+    fi
 
     pnr_number=$(echo "$1" | sed 's/^\([0-9]\{3\}\)\([0-9]\{7\}\)$/lccp_pnrno1=\1\&lccp_pnrno2=\2/')
-    echo "$1: "
-    wget -q -O - --post-data="$pnr_number" http://www.indianrail.gov.in/cgi_bin/inet_pnrstat_cgi.cgi |
-        sed -n '/Passenger\s\+[1-6]/{N;N;s/<[^>]\+>//g;s/\n/ \t| /g;s/^/\t/p}'
+    : > "$temp_file"
+    if ! wget --timeout=20 -q -O "$temp_file" --post-data="$pnr_number" "http://www.indianrail.gov.in/cgi_bin/inet_pnrstat_cgi.cgi"; then
+        echo "irctc_pnr: Error getting data"
+        shift
+        continue
+    fi
+    echo -n "$1: "
+    sed -n '/CHART/{s/<[^>]\+>//gp;q}' < "$temp_file"
+    sed -n '/Passenger\s\+[1-6]/{N;N;s/<[^>]\+>//g;s/\n/ \t| /g;s/^/\t/p}' < "$temp_file"
     shift
 done
+
+rm -f "$temp_file"
