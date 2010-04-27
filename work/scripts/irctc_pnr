@@ -3,12 +3,15 @@
 temp_file=$(mktemp) || exit
 rc_file="$HOME/.irctc_pnr"
 
+set -x
 if [ -z "$1" ]; then
-    if [ -f "$rc_file" ]; then
-        # launch myself with contents of $rc_file as arguments
+    if [ -f "$rc_file" ] && [ $(stat -c %s "$rc_file") -gt 0 ]; then
+        # Launch myself with contents of $rc_file as arguments. However, caveat here is that if the file is empty
+        # the argument list to this script when exec'ed would be empty, and thus would run infinitely in recursion.
+        # So we should check the size of the rc file and make sure it's not 0
         exec $0 $(xargs < "$rc_file")
     else
-        echo "Usage: irctc_pnr PNR_NUMBER"
+        echo "Usage: irctc_pnr [[PNR_NUMBER] [PNR_NUMBER] ... ]"
         exit 1
     fi
 fi
