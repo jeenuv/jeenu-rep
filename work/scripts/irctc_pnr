@@ -3,7 +3,6 @@
 temp_file=$(mktemp) || exit
 rc_file="$HOME/.irctc_pnr"
 
-set -x
 if [ -z "$1" ]; then
     if [ -f "$rc_file" ] && [ $(stat -c %s "$rc_file") -gt 0 ]; then
         # Launch myself with contents of $rc_file as arguments. However, caveat here is that if the file is empty
