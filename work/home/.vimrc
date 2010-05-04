@@ -327,7 +327,7 @@ if has("unix")
                                 \ silent 2,$s/\%(^\|$\)/"/g |
                                 \ silent 1,$-1s/$/ \\/g |
                                 \ noh |
-                                \ normal gg
+                                \ normal ggIcommand  
 endif
 
 " ****************************************************
