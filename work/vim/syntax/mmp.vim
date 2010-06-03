@@ -8,18 +8,18 @@ endif
 
 syn case ignore
 
-syn match mmpComment    "//.*$"
+syn match  mmpComment "//.*$"
 syn region mmpComment start="/\*" end="\*\/"
 
 syn keyword mmpKeyword aif asspabi assplibrary aaspexports baseaddress
 syn keyword mmpKeyword debuglibrary deffile document epocheapsize
 syn keyword mmpKeyword epocprocesspriority epocstacksize exportunfrozen
-syn keyword mmpStorage lang library linkas nostrictdef option option_replace
-syn keyword mmpStorage resource source sourcepath srcdbg startbitmap
-syn keyword mmpStorage start end staticlibrary strictdepend systeminclude
-syn keyword mmpStorage systemresource target targettype targetpath uid
-syn keyword mmpStorage userinclude win32_library capability epocallowdlldata exportlibrary
-syn keyword mmpStorage smpsafe firstlib
+syn keyword mmpKeyword lang library linkas nostrictdef option option_replace
+syn keyword mmpKeyword resource source sourcepath srcdbg startbitmap
+syn keyword mmpKeyword start end staticlibrary strictdepend systeminclude
+syn keyword mmpKeyword systemresource target targettype targetpath uid romtarget
+syn keyword mmpKeyword userinclude win32_library capability epocallowdlldata exportlibrary
+syn keyword mmpKeyword smpsafe firstlib
 
 syn match mmpIfdef "^\s*#\(include\|ifdef\|ifndef\|if\|endif\|else\|elif\|define\).*$" contains=mmpComment
 syn match mmpMacro "^\s*macro.*$" contains=mmpComment
@@ -36,11 +36,8 @@ if !exists("did_mmp_syntax_inits")
 
   hi def link mmpComment    Comment
   hi def link mmpKeyword    Keyword
-  hi def link mmpMacro      StorageClass
-  hi def link mmpStorage    StorageClass
-  hi def link mmpString     String
+  hi def link mmpMacro      Keyword
   hi def link mmpNumber     Number
-  hi def link mmpOrdinal    Operator
   hi def link mmpIfdef      PreCondit
 endif
 
