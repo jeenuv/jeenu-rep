@@ -1,0 +1,30 @@
+#!/bin/bash
+
+SSH_MACHINES="$1"
+
+# Read from rc file if no machine is specified in commmand line
+if [ -z "$SSH_MACHINES" -a -f "$HOME/.dosshrc" ]; then
+    SSH_MACHINES=$(cat "$HOME/.dosshrc" | sort | xargs)
+fi
+
+# Exit if there are no machines to ssh
+[ -z "SSH_MACHINES" ] && exit 1
+
+if echo "$SSH_MACHINES" | grep -q ' '; then
+    select server in $SSH_MACHINES; do
+        if [ -n "$server" ]; then
+            if [ "$TERM" = screen ]; then
+                DOSCREEN="screen -t ${server%%.*}"
+            fi
+
+            break
+        fi
+    done
+else
+    server="$SSH_MACHINES"
+    if [ "$TERM" = screen ]; then
+        DOSCREEN="screen -t ${server%%.*}"
+    fi
+fi
+
+$DOSCREEN ssh "$server"
