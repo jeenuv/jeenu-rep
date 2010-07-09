@@ -207,6 +207,10 @@ function rm()
     fi
 }
 
+function mkcd() {
+    [ -n "$1" ] && mkdir "$1" && cd "$1"
+}
+
 ############################
 ### Completion functions ###
 ############################
