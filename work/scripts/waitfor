@@ -17,7 +17,8 @@ usage="\
 Usage: waitfor [-u <until>] [-t <wait>] [-c <command>] identifier
     -u      Don't start wait loop until specified seconds has elapsed
     -t      Delay in seconds for wait loop
-    -c      Command to be executed in wait loop"
+    -c      Command to be executed in wait loop
+    -s      Same as: -c 'sudo -v'"
 wait_until=0
 wait_time=5
 wait_command=
@@ -32,7 +33,7 @@ if ! which getopt >/dev/null; then
     exit 1
 fi
 
-ARGS=$(getopt -o "u:t:c:" -q -- "$@")
+ARGS=$(getopt -o "u:t:c:s" -q -- "$@")
 if [ "$?" -ne 0 -a "$?" -ne 1 ]; then
     echo "waitfor: 'getopt' returned error"
     exit 1
@@ -56,6 +57,10 @@ until [ -z "$*" ]; do
         wait_command="$1"
         ;;
 
+        -s)
+        wait_command="sudo -v"
+        ;;
+
         --)
         shift
         break
@@ -73,7 +78,6 @@ fi
 sleep "$wait_until"
 # Convert, say, wget to [w]get
 pat="$(echo "$1" | sed 's/./[&]/')"
-while $ps_command | grep -v waitfor | grep -q "$pat"; do
-    $wait_command
-    sleep "$wait_time"
+while $ps_command | grep -v waitfor | grep -qi "$pat"; do
+    $wait_command && sleep "$wait_time" || break
 done
