@@ -165,7 +165,7 @@ nmap <F2> :ls<CR>:b|            " Lists the open buffers
 nmap K <NOP>|                   " Get rid of the annoying man page lookup
 
 " Kinda refresh
-nnoremap <C-L> :noh\|if &diff\|diffupdate\|endif<CR><C-L>
+nnoremap <C-L> :noh\|diffupdate\|checkt<CR><C-L>
 
 " Process when Enter Key is pressed
 nmap <CR> :call OnReturnKey()<CR>:echo<CR>|
