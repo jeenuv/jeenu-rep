@@ -27,8 +27,6 @@ alias L='less -iRSw'
 alias V='env -u DISPLAY vim -nR -'
 alias T='tail'
 alias H='head'
-# Colorize diff output
-alias D="sed 's/^\(Index\|---\|+++\).*/[1;32m&[0m/;s/^-.*/[1;35m&[0m/;s/^+.*/[1;36m&[0m/;s/^@@.*/[1;33m&[0m/' | L"
 
 # This is supposed to be used after a '|' from shell
 alias G='grep -nHI --exclude=\*.svn-base'
@@ -209,6 +207,12 @@ function rm()
 
 function mkcd() {
     [ -n "$1" ] && mkdir "$1" && cd "$1"
+}
+
+# Colorize diff output
+function D() {
+    sed 's/^\(Index\|---\|+++\).*/[1;32m&[0m/;s/^-.*/[1;35m&[0m/;s/^+.*/[1;36m&[0m/;s/^@@.*/[1;33m&[0m/' |
+    less -iRSw
 }
 
 ############################
