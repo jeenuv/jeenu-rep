@@ -39,6 +39,20 @@ function svnshowdiffs()
     done
 }
 
+# Function to show `git log -p` like svn diff
+# Arguments passed are passsed to svn log
+function svn_log_patch()
+{
+    svn log "$@" |
+    awk '/^r/{sub("^r", "", $1);print $1}' |
+    tac |
+    xargs sh -c 'for i; do
+                    echo "## Revision $i ##";
+                    svn diff -c $i -x --ignore-eol-style || break;
+                  done' sh |
+    D
+}
+
 # Function to get the repository URL
 function svngetrep()
 {
