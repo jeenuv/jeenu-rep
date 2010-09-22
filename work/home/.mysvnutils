@@ -47,8 +47,11 @@ function svn_log_patch()
     awk '/^r/{sub("^r", "", $1);print $1}' |
     tac |
     xargs sh -c 'for i; do
-                    echo "## Revision $i ##";
-                    svn diff -c $i -x --ignore-eol-style || break;
+                    {
+                      svn log -r $i | sed "/^-\+$/{s/-/#/g}" &&
+                      svn diff -c $i -x --ignore-eol-style 2>/dev/null;
+                    } || break;
+                    echo;
                   done' sh |
     D
 }
