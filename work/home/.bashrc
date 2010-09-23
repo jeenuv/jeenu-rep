@@ -206,7 +206,7 @@ function rm()
 }
 
 function mkcd() {
-    [ -n "$1" ] && mkdir "$1" && cd "$1"
+    [ -n "$1" ] && mkdir -p "$1" && cd "$1"
 }
 
 # Colorize diff output
