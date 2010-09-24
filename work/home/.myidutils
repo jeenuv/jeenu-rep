@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Does basically a file $(which path)
+function id_file() {
+    [ -z "$*" ] && return 1
+    local path
+    local i
+
+    for i; do
+        path="$(which "$i")" && file $path
+    done
+}
+
+function id_open() {
+    [ -z "$*" ] && return 1
+    local i
+
+    {
+        for i; do
+            which "$i"
+        done | xargs sh -c 'vi -p "$@" 0<&3 3<&-' sh
+    } 3<&0
+}
