@@ -43,16 +43,48 @@ function svnshowdiffs()
 # Arguments passed are passsed to svn log
 function svn_log_patch()
 {
-    svn log "$@" |
-    awk '/^r/{sub("^r", "", $1);print $1}' |
-    tac |
-    xargs sh -c 'for i; do
-                    {
-                      svn log -r $i | sed "/^-\+$/{s/-/#/g}" &&
-                      svn diff -c $i -x --ignore-eol-style 2>/dev/null;
-                    } || break;
-                    echo;
-                  done' sh |
+    local order_program=tee
+    local verbose limit
+    local args="$(getopt -o "rvn:" -q -- "$@")"
+    if [ "$?" -ne 0 -a "$?" -ne 1 ]; then
+        return 1
+    fi
+
+    eval set -- "$args"
+    until [ -z "$*" ]; do
+        case "$1" in
+            -r)
+            order_program=tac
+            ;;
+
+            -v)
+            verbose=-v
+            ;;
+
+            -n)
+            shift
+            limit="--limit $1"
+            ;;
+
+            --)
+            shift
+            break
+            ;;
+        esac
+
+        shift
+    done
+
+    svn_url="$@"
+    svn log $limit $svn_url |
+    awk '/^r/{sub("^r[0-9]+ |", "", $1);print $1}' |
+    $order_program |
+    { xargs sh -c "for i; do
+                       svn log -r \$i $verbose $svn_url | sed '1{s/-/#/g};\${s/--/v-/g}' &&
+                       svn diff -c \$i -x --ignore-eol-style $svn_url
+                       echo
+                   done" sh;
+    } 2>/dev/null |
     D
 }
 
