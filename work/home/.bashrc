@@ -55,7 +55,7 @@ HISTSIZE=1000
 HISTCONTROL=ignorespace:ignoredups:erasedups
 
 # Local screenrc file (sourced from .screenrc)
-SCREENRC_LOCAL=$HOME/.screenrc.local
+export SCREENRC_LOCAL=$HOME/.screenrc.local
 
 # Processing for setting up less
 if [ -z "$LESSOPEN" ]; then
