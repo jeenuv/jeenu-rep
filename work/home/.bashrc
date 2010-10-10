@@ -289,6 +289,9 @@ fi
 # My own GIT utilities
 [ -f "$HOME/.mygitutils" ] && source "$HOME/.mygitutils"
 
+# ID utils
+[ -f "$HOME/.myidutils" ] && source "$HOME/.myidutils"
+
 # Set colors for 'ls'
 [ "$TERM" != "dump" ] && eval "$(dircolors -b)"
 
