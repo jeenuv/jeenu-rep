@@ -2,17 +2,14 @@
 	name = Jeenu V
 	email = jeenuv@gmail.com
 [alias]
-	br = branch
-	co = checkout
-	st = status
 	diffe = diff --ext-diff
 	diffi = diff --no-ext-diff
-	olog = log --pretty=oneline --abbrev-commit
-	grepc = grep --cached
-	og = log --pretty=oneline --abbrev-commit --all --graph
-	flog = log --first-parent --pretty=oneline --abbrev-commit
-	oshow = show --pretty=oneline
 	diffc = diff --cached
+	rlog = log --reverse
+	olog = log --pretty=oneline --abbrev-commit
+	flog = log --first-parent --pretty=oneline --abbrev-commit
+	og = log --pretty=oneline --abbrev-commit --all --graph
+	oshow = show --pretty=oneline
 [color]
 	diff = auto
 	status = true
