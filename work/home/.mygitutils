@@ -43,3 +43,15 @@ function gitshowdiffs()
     done
     )
 }
+
+# Open gitk window without stgit-managed branches
+function gitk()
+{
+    local script_file="$HOME/tmp/filter-stgit-branches.sh"
+    [ ! -x "$script_file" ] && cat <<-EOF >"$script_file"  && chmod +x "$script_file"
+	#!/bin/bash
+	git show-ref --heads | awk -F/ '!/\.stgit/{print \$NF}'
+	EOF
+    # Dummy rev-parse invocation to make sure we're in a git repository
+    git rev-parse && command gitk --argscmd="$script_file" &>/dev/null
+}
