@@ -81,6 +81,8 @@ for index in "${!NAME[@]}"; do
         else
             script_echo "error building tag '${NAME[$index]}'"
         fi
+    elif [ $CONFIRMED = "quit" ]; then
+        exit
     fi
 done
 

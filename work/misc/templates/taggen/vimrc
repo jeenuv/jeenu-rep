@@ -53,4 +53,6 @@ else
     echo "Couldn't find the cs db!"
 endif
 
-command T :tags
+command -complete=tag    -narg=1  T   tab  stj  <args>
+command -complete=tag    -nargs=1 VT  vert stj  <args>
+command -complete=buffer -nargs=1 VB  vert sb   <args>
