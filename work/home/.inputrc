@@ -1,5 +1,8 @@
-# ignore case on completion
+# Ignore case on completion
 set completion-ignore-case on
+
+# Show completions immediately rather than ringing bell
+# set show-all-if-ambiguous on
 
 # mark modified history lines with *
 # set mark-modified-lines on
@@ -7,4 +10,9 @@ set completion-ignore-case on
 # show file types on ambiguity list
 set visible-stats on
 
+# Ctrl-G does the opposite of Ctrl-R
+# Ctrl-S is supposed to do it bu tit suspends the shell instead
 "\C-g": forward-search-history
+
+# Use menu-style completion bound to Ctrl-I a.k.a TAB
+"\C-i": menu-complete
