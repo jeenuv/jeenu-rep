@@ -2,7 +2,7 @@
 set completion-ignore-case on
 
 # Show completions immediately rather than ringing bell
-# set show-all-if-ambiguous on
+set show-all-if-ambiguous on
 
 # mark modified history lines with *
 # set mark-modified-lines on
