@@ -275,6 +275,9 @@ if shopt expand_aliases &>/dev/null; then
     shell_aliases_disabled=yes
 fi
 
+# I don't want completion suggestions on a empty command line
+shopt -s no_empty_cmd_completion
+
 # Bookmarking features
 [ -f "$HOME/.mybashutils" ] && source "$HOME/.mybashutils"
 
