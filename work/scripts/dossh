@@ -8,8 +8,12 @@ if [ -z "$SSH_MACHINES" -a -f "$HOME/.dosshrc" ]; then
 fi
 
 # Exit if there are no machines to ssh
-[ -z "SSH_MACHINES" ] && exit 1
+if [ -z "$SSH_MACHINES" ]; then
+    echo "dossh: No machine to SSH to"
+    exit 1
+fi
 
+# If there are more than one machines (most likely read from rc file)
 if echo "$SSH_MACHINES" | grep -q ' '; then
     select server in $SSH_MACHINES; do
         if [ -n "$server" ]; then
