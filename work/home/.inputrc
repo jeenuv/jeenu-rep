@@ -14,5 +14,5 @@ set visible-stats on
 # Ctrl-S is supposed to do it bu tit suspends the shell instead
 "\C-g": forward-search-history
 
-# Use menu-style completion bound to Ctrl-I a.k.a TAB
-"\C-i": menu-complete
+# Use menu-style completion bound to Alt-I
+"\ei": menu-complete
