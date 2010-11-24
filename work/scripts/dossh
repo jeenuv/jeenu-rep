@@ -13,21 +13,25 @@ if [ -z "$SSH_MACHINES" ]; then
     exit 1
 fi
 
+function screen_title()
+{
+    echo "$1" | sed 's/^[^@]\+@//;s/\..*$//'
+}
+
 # If there are more than one machines (most likely read from rc file)
 if echo "$SSH_MACHINES" | grep -q ' '; then
     select server in $SSH_MACHINES; do
         if [ -n "$server" ]; then
             if [ "$TERM" = screen ]; then
-                DOSCREEN="screen -t ${server%%.*}"
+                DOSCREEN="screen -t $(screen_title "$server")"
             fi
-
             break
         fi
     done
 else
     server="$SSH_MACHINES"
     if [ "$TERM" = screen ]; then
-        DOSCREEN="screen -t ${server%%.*}"
+        DOSCREEN="screen -t $(screen_title "$server")"
     fi
 fi
 
