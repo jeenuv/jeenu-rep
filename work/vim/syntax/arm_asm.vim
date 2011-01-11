@@ -40,69 +40,42 @@ syn match armRegister           "\<[CRP][0-9]\>"
 syn match armRegister           "\<[CRP]1[0-5]\>"
 syn keyword armRegister         LR PC SP CPSR CPSR_C CPSR_CF SPSR
 
-
 "" Instructions
 for pat in ["MOV", "MVN", "M\(RS\|SR\)"]
     exe "syn match armMoveKeyword " . '"\<' . pat . '\w\{,3\}"' . " contains=armConditional"
 endfor
-" syn match armMoveKeyword        "\<MOV\w\{,3\}" contains=armConditional
-" syn match armMoveKeyword        "\<MVN\w\{,3\}" contains=armConditional
-" syn match armMoveKeyword        "\<M\(RS\|SR\)\w\{,3\}" contains=armConditional
 
 for pat in ['ADD', 'ADC', 'SUB', 'SBC', 'RSB', 'MUL', 'MLA', '[US]M\(ULL\|LAL\)', 'CLZ']
     exe "syn match armArithmKeyword " . '"\<' . pat . '\w\{,3\}"' . " contains=armConditional"
 endfor
-" syn match armArithmKeyword      "\<ADD\w\{,3\}" contains=armConditional
-" syn match armArithmKeyword      "\<ADC\w\{,3\}" contains=armConditional
-" syn match armArithmKeyword      "\<SUB\w\{,3\}" contains=armConditional
-" syn match armArithmKeyword      "\<SBC\w\{,3\}" contains=armConditional
-" syn match armArithmKeyword      "\<RSB\w\{,3\}" contains=armConditional
-" syn match armArithmKeyword      "\<RSC\w\{,3\}" contains=armConditional
-" syn match armArithmKeyword      "\<MUL\w\{,3\}" contains=armConditional
-" syn match armArithmKeyword      "\<MLA\w\{,3\}" contains=armConditional
-" syn match armArithmKeyword      "\<[US]MULL\w\{,3\}" contains=armConditional
-" syn match armArithmKeyword      "\<[US]MLAL\w\{,3\}" contains=armConditional
-" syn match armArithmKeyword      "\<CLZ\w\{,3\}" contains=armConditional
 
 for pat in ['TST', 'TEQ', 'AND', 'EOR', 'ORR', 'BIC', 'LS\(R\|L\)', 'NOP']
     exe "syn match armLogicKeyword " . '"\<' . pat . '\w\{,3\}"' . " contains=armConditional"
 endfor
-" syn match armLogicKeyword       "\<TST\w\{,3\}" contains=armConditional
-" syn match armLogicKeyword       "\<TEQ\w\{,3\}" contains=armConditional
-" syn match armLogicKeyword       "\<AND\w\{,3\}" contains=armConditional
-" syn match armLogicKeyword       "\<EOR\w\{,3\}" contains=armConditional
-" syn match armLogicKeyword       "\<ORR\w\{,3\}" contains=armConditional
-" syn match armLogicKeyword       "\<BIC\w\{,3\}" contains=armConditional
-" syn match armLogicKeyword       "\<LS\(R\|L\)\w\{,3\}" contains=armConditional
-" syn match armLogicKeyword       "\<NOP\>"
 
 for pat in ['CMP', 'CMN']
     exe "syn match armCompareKeyword " . '"\<' . pat . '\w\{,3\}"' . " contains=armConditional"
 endfor
-" syn match armCompareKeyword     "\<CMP\w\{,3\}" contains=armConditional
-" syn match armCompareKeyword     "\<CMN\w\{,3\}" contains=armConditional
-
-syn match armBranchKeyword      "\<BL\?X\?\w\{,3\}" contains=armConditional
 
 for pat in ['LDR\(EX\)\?', 'LDM']
     exe "syn match armLoadKeyword " . '"\<' . pat . '\w\{,3\}"' . " contains=armConditional"
 endfor
-" syn match armLoadKeyword        "\<LDR\w\{,3\}" contains=armConditional
-" syn match armLoadExKeyword      "\<LDREX\w\{,3\}" contains=armConditional
-" syn match armLoadMKeyword       "\<LDM\w\{,3\}" contains=armConditional
 
 for pat in ['STR\(EX\)\?', 'STM']
     exe "syn match armStoreKeyword " . '"\<' . pat . '\w\{,3\}"' . " contains=armConditional"
 endfor
-" syn match armStoreKeyword       "\<STR\w\{,3\}" contains=armConditional
-" syn match armStoreExKeyword     "\<STREX\w\{,3\}" contains=armConditional
-" syn match armStoreMKeyword      "\<STM\w\{,3\}" contains=armConditional
 
 for pat in ['WF[EI]', 'SEV']
     exe "syn match armWaitKeyword " . '"\<' . pat . '\w\{,3\}"' . " contains=armConditional"
 endfor
 
-syn keyword armInstruction      HALT SWI MCR MRC ASL ASR ROR RRX SETCPSR SETSPSR GETCPSR DSB DMB
+for pat in ['MCRR\?', 'MRR\?C']
+    exe "syn match armInstruction " . '"\<' . pat . '\w\{,3\}"' . " contains=armConditional"
+endfor
+
+syn match armBranchKeyword "\<BL\?X\?\w\{,3\}" contains=armConditional
+
+syn keyword armInstruction      HALT SWI ASL ASR ROR RRX SETCPSR SETSPSR GETCPSR DSB DMB ISB CLREX MSR MRS PUSH POP
 
 syn keyword armAssembler        IF ELIF ELSE ENDIF MACRO MEND EXPORT IMPORT GBLL INCLUDE CODE READONLY ALIGN AREA END DCB DCD DCDU DCW DCWU DCDO SPACE FILL SETL SETA DWORD ROUT
 syn match   armAssembler        "^[a-zA-Z0-9_]\+:\?" contains=armComment
@@ -136,11 +109,7 @@ if version >= 508 || !exists("did_arm_syntax_inits")
         HiLink  armCompareKeyword       Statement
         HiLink  armBranchKeyword        Statement
         HiLink  armLoadKeyword          Statement
-        HiLink  armLoadExKeyword        Statement
-        HiLink  armLoadMKeyword         Statement
         HiLink  armStoreKeyword         Statement
-        HiLink  armStoreExKeyword       Statement
-        HiLink  armStoreMKeyword        Statement
         HiLink  armInstruction          Statement
         HiLink  armWaitKeyword          Statement
 
