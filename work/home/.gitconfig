@@ -10,6 +10,7 @@
 	flog = log --first-parent --pretty=oneline --abbrev-commit
 	og = log --pretty=oneline --abbrev-commit --all --graph
 	oshow = show --pretty=oneline
+	sb = "!sh -c '[ -x $HOME/tmp/git-sb ] && exec $HOME/tmp/git-sb'"
 [color]
 	diff = auto
 	status = true
