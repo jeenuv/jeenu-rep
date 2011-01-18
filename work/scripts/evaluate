@@ -23,32 +23,12 @@ field=4
 
 until [ -z "$*" ]; do
     case "$1" in
-        -x)
-        f=x
-        ;;
-
-        -o)
-        f=o
-        ;;
-
-        -b)
-        f=b
-        ;;
-
-        -w)
-        shift
-        width="$1"
-        ;;
-
-        -f)
-        shift
-        field="$1"
-        ;;
-
-        --)
-        shift
-        break
-        ;;
+        -x) f=x;;
+        -o) f=o;;
+        -b) f=b;;
+        -w) shift; width="$1";;
+        -f) shift; field="$1";;
+        --) shift; break;;
     esac
 
     shift
