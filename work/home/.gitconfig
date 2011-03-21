@@ -17,6 +17,5 @@
 	ui = true
 [core]
 	pager = less -iw
-	editor = vi \"+set tw=72 spell\"
 [log]
 	showroot = false

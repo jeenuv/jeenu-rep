@@ -240,6 +240,7 @@ set <BS>=
 " ***************** AUTO COMMANDS ********************
 " ****************************************************
 
+let s:flp = '^\\s*\\%(\\%((\\?\\%([A-Z]\\\|[a-z]\\+\\\|\\d\\+\\)\\)[:.)]\\\|[-*+]\\)\\s\\+'
 " Put these in an autocmd group, so that we can delete them easily.
 if has("autocmd")
     augroup vimrcJeenu
@@ -258,7 +259,7 @@ if has("autocmd")
         " I don't want comment leaders being inserted!
         autocmd FileType text
                     \ setlocal textwidth=78 |
-                    \ setlocal formatlistpat=^\\s*\\%(\\%((\\?\\%([A-Z]\\\|[a-z]\\+\\\|\\d\\+\\)\\)[:.)]\\\|[-*+]\\)\\s\\+ |
+                    \ exe "setlocal formatlistpat=" . s:flp |
                     \ setlocal formatoptions=tn |
                     \ setlocal comments= commentstring=
 
@@ -284,6 +285,13 @@ if has("autocmd")
             autocmd TabLeave * let g:J_old_tab = tabpagenr()
             autocmd TabEnter * let g:J_new_tab = tabpagenr()
         endif
+
+        " Auto commands for Git
+        autocmd FileType gitcommit
+            \ setlocal textwidth=72 |
+            \ exe "setlocal formatlistpat=" . s:flp |
+            \ setlocal formatoptions=tn |
+            \ setlocal spell
     augroup END
 endif
 
