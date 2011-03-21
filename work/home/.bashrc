@@ -40,7 +40,7 @@ export PS1='\e[22;31m\H\e[00m [\e[22;32m\w\e[00m]\n\! $ '
 export PS3='> '
 
 # Even if this is done from bash_profile, it's safe to have it here
-echo $PATH | grep "^$HOME/bin" >/dev/null || export PATH=~/bin:$PATH
+echo $PATH | grep "$HOME/bin" >/dev/null || export PATH=$HOME/bin:$PATH
 
 export EDITOR='env -u DISPLAY vim'
 export SVN_EDITOR='env -u DISPLAY vim "+set tw=100"'
