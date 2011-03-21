@@ -222,6 +222,8 @@ vmap g# y?<C-R>=escape('<C-R>"', '$.*/~[]\')<CR><CR>
 
 " Wrap selection with selected character
 vmap \w :call GetWrapperChoiceFromUser()<CR>
+" Wrap selection with selected tag
+vmap \t :call GetTagWrapperChoiceFromUser()<CR>
 
 " ****************************************************
 " *************** TERMINAL SETTINGS ******************
@@ -494,6 +496,20 @@ function! GetWrapperChoiceFromUser() range
     execute "normal `>a" . pair . "\<ESC>`<i" . choice . "\<ESC>"
 endfunction
 
+" Function to obtain a tag from user, when the he decides to wrap
+" the selection with corresponding closing tag
+function! GetTagWrapperChoiceFromUser() range
+    let choice = input("Enter a tag to wrap: ")
+    let length = len(choice)
+    let pair = ""
+    let index = 0
+
+    let pair = "</" . choice . ">"
+    let choice = "<" . choice . ">"
+
+    " Now wrap the selection with the selected character and it's pair
+    execute "normal `>a" . pair . "\<ESC>`<i" . choice . "\<ESC>"
+endfunction
 " Function for preparing an SVN commit. Just do PrepareSVNCommit command and
 " you'll get the list of files eligible for commit
 function! PrepareSVNCommit()
