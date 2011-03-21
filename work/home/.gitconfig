@@ -19,3 +19,5 @@
 	pager = less -iw
 [log]
 	showroot = false
+[push]
+	default = nothing
