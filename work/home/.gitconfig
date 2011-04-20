@@ -21,3 +21,5 @@
 	showroot = false
 [push]
 	default = nothing
+[merge]
+	tool = vimdiff
