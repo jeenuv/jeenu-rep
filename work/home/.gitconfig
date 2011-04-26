@@ -23,3 +23,5 @@
 	default = nothing
 [merge]
 	tool = vimdiff
+[svn]
+	rmdir = true
