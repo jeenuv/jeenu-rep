@@ -22,4 +22,4 @@ if ! echo "$1" | awk -F- '{
 fi
 
 GIVEN_DATE=$(date -d "$1") || exit
-date -d "$GIVEN_DATE - 90 days" +%F
+date -d "$GIVEN_DATE - 120 days" +%F
