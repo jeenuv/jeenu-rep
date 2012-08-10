@@ -26,5 +26,6 @@
 	default = nothing
 [merge]
 	tool = vimdiff
+	conflictStyle = diff3
 [svn]
 	rmdir = true
