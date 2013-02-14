@@ -1,6 +1,8 @@
 bind generic g move-first-line
 
+bind generic G move-last-line
 bind main G move-last-line
+bind blame G move-last-line
 bind diff G move-last-line
 bind log G move-last-line
 bind help G move-last-line
