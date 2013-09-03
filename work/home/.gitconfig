@@ -28,5 +28,3 @@
 	lineNumber = true
 [rebase]
 	autosquash = true
-[column]
-	ui = auto
