@@ -35,7 +35,11 @@ set ruler                                               " show the cursor positi
 set showcmd                                             " display incomplete commands
 set incsearch                                           " do incremental searching
 set backspace=indent,eol,start                          " allow backspacing over everything in insert mode
-set number                                              " display line numbers
+if v:version >= 703
+    set relativenumber                                  " Set relative numbering for 7.3 and above
+else
+    set number                                          " display line numbers
+endif
 set shiftwidth=4                                        " Indenting width when using < and > commands
 set softtabstop=4
 set expandtab                                           " Convert tabs to spaces
