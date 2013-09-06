@@ -98,13 +98,22 @@ function up()
 {
     local dir=
     local i
+    local nups=
 
     if [ -z "$1" ]; then
-        cd ..
-        ls
-        return
+        # Go to parent by if nothing specified
+        nups=1
+    elif echo "$1" | grep -qv '[0-9]'; then
+        # If non numeric, use awk to split and match parent directories
+        nups="$(echo $PWD | awk -v dir="$1" -F/ 'END{for(i=NF;i>=1;i--)if($i~dir){print NF-i;exit;}}')"
+        if [ -z "$nups" ] || echo "$nups" | grep -qv '[0-9]'; then
+            # Do nothing if we couldn't find a match
+            return
+        fi
+    else
+        nups="$1"
     fi
-    eval "for i in {1..$1}; do dir=\"\$dir../\"; done"
+    eval "for i in {1..$nups}; do dir=\"\$dir../\"; done"
     cd $dir
     ls
 }
