@@ -6,6 +6,55 @@ CHANGED_BM=0
 # Default bookmark profile
 PROFILE_BM="$HOME/.book"
 
+# Function to go up in the directory; level is specified as argument
+function up()
+{
+    local dir=
+    local i
+    local nups=
+
+    if [ -z "$1" ]; then
+        # Go to parent by if nothing specified
+        nups=1
+    elif echo "$1" | grep -qv '[0-9]'; then
+        # If non numeric, use awk to split and match parent directories
+        nups="$(echo $PWD | awk -v dir="$1" -F/ 'END{for(i=NF;i>=1;i--)if($i~dir){print NF-i;exit;}}')"
+        if [ -z "$nups" ] || echo "$nups" | grep -qv '[0-9]'; then
+            # Do nothing if we couldn't find a match
+            return
+        fi
+    else
+        nups="$1"
+    fi
+    eval "for i in {1..$nups}; do dir=\"\$dir../\"; done"
+    cd $dir
+    ls
+}
+
+# Keep cd-ing into directories
+function cdn()
+{
+    local nth
+    local listing
+    local dir
+    local max
+
+    while :; do
+        echo "$PWD"
+        listing=( $(find -maxdepth 1 -type d 2>/dev/null | sed '1{s/.*/../;n};s#^\./##' | sort) )
+        let "max = ${#listing[@]} - 1"
+        echo "${listing[@]}" | sed 's/ /\n/g' | awk '{printf "%5s: %s\n", NR - 1, $0}'
+
+        read -p "cdn > " nth
+        eval nth="$nth"
+        if [ -z "$nth" ] || echo "$nth" | grep -qv '^[0-9]\+$' || [ "$nth" -gt "$max" ]; then
+            return
+        fi
+        dir="${listing[$nth]}"
+        [ "$dir" ] && cd "$dir"
+    done
+}
+
 # Funtion to ask y/n questions
 function confirm()
 {
@@ -284,3 +333,26 @@ if [ ! -f "$HOME/.book" ]; then
     echo "#BOOKMARK" > "$HOME/.book"
 fi
 bmprofile "$HOME/.book"
+
+function dirsadd()
+{
+    pushd -n $PWD
+}
+
+function dirstore()
+{
+    [ "$1" ] && dirs -v | awk 'NR>1{print $2}' > "$1"
+}
+
+function dirsload()
+{
+    local entry
+
+    if [ -z "$1" ] || [ ! -f "$1" ]; then
+        echo "No such file: '$1'"
+        return;
+    fi
+    while read entry; do
+        pushd -n "$entry" &>/dev/null
+    done < "$1"
+}
