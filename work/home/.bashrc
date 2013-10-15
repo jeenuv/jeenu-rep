@@ -115,11 +115,12 @@ function makevimprojtags()
 }
 
 # Function to play all media files in a directory. More file types can be added later
+# Arguments are passed to mplayer directly
 function playall()
 {
     {
         find \( -iname \*avi -o -iname \*mp\*g -o -iname \*wmv -o -iname \*dat \) -print0 | \
-        xargs -0 sh -c 'exec mplayer "$@" <&3 3<&-' sh;
+        xargs -0 sh -c "exec mplayer $1 \"\$@\" <&3 3<&-" sh;
     } 3<&0
 }
 
