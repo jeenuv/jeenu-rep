@@ -6,7 +6,7 @@ CHANGED_BM=0
 # Default bookmark profile
 PROFILE_BM="$HOME/.book"
 
-# Function to go up in the directory; level is specified as argument
+# Function to go up in the directory; level or part of parent director name is specified as argument
 function up()
 {
     local dir=
@@ -18,7 +18,7 @@ function up()
         nups=1
     elif echo "$1" | grep -qv '[0-9]'; then
         # If non numeric, use awk to split and match parent directories
-        nups="$(echo $PWD | awk -v dir="$1" -F/ 'END{for(i=NF;i>=1;i--)if($i~dir){print NF-i;exit;}}')"
+        nups="$(echo $PWD | awk -v dir="$1" -F/ 'END{for(i=NF-1;i>=1;i--)if($i~dir){print NF-i;exit;}}')"
         if [ -z "$nups" ] || echo "$nups" | grep -qv '[0-9]'; then
             # Do nothing if we couldn't find a match
             return
