@@ -260,11 +260,12 @@ shopt -s no_empty_cmd_completion
 # Enable extended shell globing
 shopt -s extglob
 
-# I don't want alias expansions to happen when sourcing other utilities
-if shopt expand_aliases &>/dev/null; then
-    shopt -u expand_aliases
-    shell_aliases_disabled=yes
-fi
+# Enable history re-editing and history verification
+shopt -s histreedit
+shopt -s histverify
+
+# Disable alias expansion for now
+shopt -u expand_aliases
 
 # Bookmarking features
 [ -f "$HOME/.mybashutils" ] && source "$HOME/.mybashutils"
@@ -287,11 +288,8 @@ fi
 # This, preferably, should be the last line in this file
 [ -f "$HOME/.bashrc.local" ] && source "$HOME/.bashrc.local"
 
-# Restore the shell aliasing setting
-if [ "$shell_aliases_disabled" = "yes" ]; then
-    shopt -s expand_aliases
-    unset shell_aliases_disabled
-fi
+# Re-enable alias expansion
+shopt -s expand_aliases
 
 # Set colors for 'ls'
 [ "$TERM" != "dump" ] && eval "$(dircolors -b)"
