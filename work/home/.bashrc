@@ -10,7 +10,6 @@
 ###########################
 alias cd..='cd ..'
 alias j='jobs -l'
-alias h='history'
 alias la='ls -a'
 alias ll='ls --color=tty -l'
 alias lr='ls --color=tty -1rt'
@@ -24,6 +23,7 @@ alias cp='cp -iv'
 alias mv='mv -iv'
 alias rm='rm -iv'
 alias L='less -iRSw'
+alias h='history | tac | L'         # Show history in reverse
 alias V='env -u DISPLAY vim -nR -'
 alias T='tail'
 alias H='head'
