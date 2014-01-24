@@ -318,14 +318,14 @@ command! GitDiff execute "!git diff --cached -p --no-prefix --no-ext-diff -- % >
                     \ call DoMyDiff()
 
 " Command for entering navigation choice
-command! -nargs=? SetNavChoice call GetNPNavigatonChoiceFromUser("<args>")
+command! -nargs=? SetNavChoice call GetNPNavigatonChoiceFromUser(<q-args>)
 
 " Command for preparing SVN commit. This command is expected to be issed from a vim
 " window obtained after presseing C-x C-e in bash
 command! -nargs=0 PrepareSVNCommit call PrepareSVNCommit()
 
 " For aligning lines left or right w.r.t to a vertical selectin
-command! -range -nargs=1 Align call AlignVert("<args>")
+command! -range -nargs=1 Align call AlignVert(<q-args>)
 
 " Insert a (possibly) unique timestamp
 command -nargs=0 -count=1 Timestamp call InsertTimestamp("<count>")
