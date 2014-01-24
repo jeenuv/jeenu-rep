@@ -164,8 +164,6 @@ endif
 imap <C-F> <C-O>l|              " Cursor movements as in Bash
 imap <C-B> <C-O>h|
 
-nmap <F8> <C-W>g}|              " Look up the tag in the preview window
-nmap <F2> :ls<CR>:b|            " Lists the open buffers
 nmap K <NOP>|                   " Get rid of the annoying man page lookup
 
 " Kinda refresh
@@ -180,7 +178,6 @@ nmap <SPACE> i <ESC>l|          " Inser a space in normal mode
 nmap \c ^i/* <ESC>$a */<ESC>|               " For commenting out a single line
 nmap \uc ^3x$xhxhx|                         " For uncommenting a single line
 nmap \s i <ESC>2li <ESC>h|                  " For inserting space on both sides of a character
-nmap \j :tag /Java_.*<C-R><C-W>|            " For searching for a Java native implementation tag
 
 " Mapping to do <C-T> on a separate window so that you can see both caller and
 " callee in separate windows
