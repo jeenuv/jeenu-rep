@@ -54,7 +54,8 @@ set nowrapscan                                          " Don't wrap searches
 set autoread                                            " Read changed files automatically
 set splitright                                          " place new window to the right of the current one when doing vertical splitting
 set virtualedit=all                                     " Enable virtual editing
-set ignorecase                                          " Ignore the case for tag-matching!
+set ignorecase                                          " Ignore the case for expression matching
+set smartcase                                           " Use smart case
 set nostartofline                                       " Don't move the cursor from the current columnt after move commands
 set t_Co=256                                            " No. of terminal colors
 set cmdwinheight=15                                     " Command line window height
