@@ -3,7 +3,6 @@
 PROGNAME="$(basename "$0")"
 if ! which getopt >/dev/null; then
     echo "$PROGNAME: This script requires GNU getopt in \$PATH"
-    echo "$must"
     exit 1
 fi
 
@@ -79,9 +78,12 @@ COMMAND="$COMMAND -i $PROJECT_LOC/viminfo"
 [ -f "$PROJECT_LOC/initrc" ] && source $PROJECT_LOC/initrc
 
 # Check if tags exist
+PROJECT_TAGS=
+PROJECT_LISTS=
 for tag in $(echo "$tagname" | sed 's/,/ /g'); do
     if [ -f "$PROJECT_LOC/$tag.tag" ]; then
         PROJECT_TAGS="${PROJECT_TAGS}${PROJECT_LOC}/${tag}.tag,"
+        PROJECT_LISTS="${PROJECT_LISTS}${PROJECT_LOC}/${tag}.list"
     else
         if ! confirm "$tag.tag doesn't exist in $PROJECT_NAME. Continue"; then
             exit 1
@@ -93,6 +95,7 @@ done
 if ! echo "$PROJECT_TAGS" | grep -q "main.tag"; then
     if [ -f "$PROJECT_LOC/main.tag" ]; then
         PROJECT_TAGS="$PROJECT_LOC/main.tag,${PROJECT_TAGS}"
+        PROJECT_LISTS="$PROJECT_LOC/main.list ${PROJECT_LISTS}"
     else
         if ! confirm "main.tag doesn't exist in $PROJECT_NAME. Continue"; then
             exit 1
@@ -100,6 +103,8 @@ if ! echo "$PROJECT_TAGS" | grep -q "main.tag"; then
     fi
 fi
 
+# List project tags separated by space
+export PROJECT_LISTS
 export PROJECT_TAGS
 export PROJECT_LOC
 

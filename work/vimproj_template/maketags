@@ -1,5 +1,8 @@
 #!/bin/bash
 
+PROGNAME="$(basename $0)"
+THISDIR="$(readlink -f "$(dirname "$0")")"
+
 function script_echo()
 {
     echo "$PROGNAME: $@"
@@ -9,25 +12,31 @@ function buildfiles()
 {
     local taglist="${LIST[$1]}"
     local tagdirs="${DIRS[$1]}"
+    local tagdirs_flat="${DIRS_FLAT[$1]}"
+    local files="${FILES[$1]}"
     local findexpr="${FINDEXPR[$1]}"
+    local build=0
 
     if [ -f "$taglist" ]; then
         if confirm "delete and remake $taglist"; then
             rm "$taglist"
-            script_echo "building list of files"
-            find $tagdirs -name .svn -prune -o $findexpr -print > "$taglist"
+            build=1
         fi
     else
+        build=1
+    fi
+
+    if [ "$build" = 1 ]; then
         script_echo "building list of files"
-        find $tagdirs -name .svn -prune -o $findexpr -print > "$taglist"
+        : > "$taglist"
+        [ "$tagdirs_flat" ] &&
+            find $(eval echo $tagdirs_flat) -maxdepth 1 \( -name .svn -o -name .git \) -prune -o \( -type f -a \( $findexpr \) \) -print >> "$taglist"
+        [ "$tagdirs" ] &&
+            find $(eval echo $tagdirs) \( -name .svn -o -name .git \) -prune -o \( -type f -a \( $findexpr \) \) -print >> "$taglist"
+        [ "$files" ] &&
+            echo $(eval echo $files) >> "$taglist"
     fi
 }
-
-PROGNAME=$(basename $0)
-THISDIR=$( (cd $(dirname $0) && pwd) )
-
-LIST=files.ctags.list
-CSCOPELIST=files.cscope.list
 
 cd "$THISDIR"
 
@@ -47,18 +56,13 @@ fi
 NAME[0]="main"
 FILENAME[0]="${NAME[0]}.tag"
 LIST[0]="${NAME[0]}.list"
-FINDEXPR[0]="( -iname *.cpp -o -iname *.h -o -iname *.inl -o -iname *.s -o -iname *.cia -o -iname *.inc )"
-DIRS[0]="$PROJECT_ROOT/sf/os/boardsupport/arm
-         $PROJECT_ROOT/sf/os/kernelhwsrv/kernel/eka
-         $PROJECT_ROOT/sf/os/kernelhwsrv/userlibandfileserver/fileserver
-         $PROJECT_ROOT/sf/os/kernelhwsrv/halservices"
-
-NAME[1]="test"
-FILENAME[1]="${NAME[1]}.tag"
-LIST[1]="${NAME[1]}.list"
-FINDEXPR[1]="${FINDEXPR[0]}"
-DIRS[1]="$PROJECT_ROOT/sf/os/kernelhwsrv/kerneltest/e32test
-         $PROJECT_ROOT/sf/os/kernelhwsrv/kerneltest/f32test"
+FINDEXPR[0]="-iname *.c -o -iname *.h -o -iname *.S -o -iname *.s -o -iname *.in[sc] -o -name Makefile"
+DIRS[0]="
+$PROJECT_ROOT
+"
+DIRS_FLAT[0]="
+"
+FILES[0]=""
 
 for index in "${!NAME[@]}"; do
     if confirm "build tag '${NAME[$index]}'"; then
@@ -70,13 +74,7 @@ for index in "${!NAME[@]}"; do
         script_echo "building tag '${NAME[$index]}'"
         if ctags -L "${LIST[$index]}" \
             -o "${FILENAME[$index]}" \
-            --langmap=c++:+.inl,c++:+.cia,asm:+.inc \
-            --extra=+f \
-            --extra=+q \
-            -I __FALCON__ \
-            -I NONSHARABLE_CLASS=class\
-            -I EXPORT_C \
-            -I IMPORT_C; then
+            --extra=+f; then
             script_echo "finished building tag '${NAME[$index]}'"
         else
             script_echo "error building tag '${NAME[$index]}'"
@@ -97,9 +95,24 @@ DIRS[2]="${DIRS[0]}"
 if confirm "build cscope"; then
     buildfiles 2
 
-    if mlcscope -b -q -k -i "${LIST[2]}" -f "${FILENAME[2]}"; then
-        script_echo "cscope db built"
+    for program in cscope mlcscope ""; do
+        which $program &>/dev/null && break
+    done
+
+    if [ -z "$program" ]; then
+        script_echo "No CScope program found"
     else
-        script_echo "error building cs db"
+        if $program -b -q -k -i "${LIST[2]}" -f "${FILENAME[2]}"; then
+            script_echo "cscope db built"
+        else
+            script_echo "error building cs db"
+        fi
     fi
 fi
+
+## Generate VIMRC
+
+# Generate vimrc. Escape spaces
+cat <<EOF > vimrc.generated
+set grepprg=xargs\ grep\ -nH\ \$*\ <\ <(cat\ \$PROJECT_LISTS)
+EOF

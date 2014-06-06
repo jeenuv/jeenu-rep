@@ -12,28 +12,22 @@ let s:root_dir = $PROJECT_ROOT
 
 let &tags = $PROJECT_TAGS
 
-set path=.,,
-exe "set path+=" . s:root_dir . "/sf/os/kernelhwsrv/kernel/eka/include"
-exe "set path+=" . s:root_dir . "/sf/os/boardsupport/arm"
-
-set foldopen-=block
-
 " Only look for .h files with gf and friends
 set suffixesadd=.h
 
-" Set the grep path
-exe "set grepprg=grep\\ -nr\\ '$*'\\ " . s:root_dir . "\\ \\\\\\|\\ sed\\ \\\"/\\\\.svn/d\\\""
-
-" Modify makeprg to accomodate arguments
-" set makeprg=make\ $*
-
 set nowrap
+set shiftwidth=4
+set tabstop=4
+set softtabstop=4
+set nolist
+set expandtab
 
-au BufRead,BufNew *.cia set ft=cpp
-au BufRead,BufNew *.cpp,*.h,*.inl,*.cia,*s,*.inc source ~/jeenu-rep/work/vim/symbian.vim
+" Indent statements after case, w.r.t case, even if there's a brace
+set cino=l1
+autocmd BufNew,BufEnter *.[chS] set textwidth=80
 
 if filereadable($HOME . "/.vim/syntax/arm_asm.vim")
-    au BufNewFile,BufRead *.s,*.inc set ft=arm_asm
+    au BufNewFile,BufRead *.S,*.ins set ft=arm_asm
 endif
 
 " We've lot of multiple tag definitions
@@ -49,10 +43,17 @@ if filereadable(s:this_dir . "/main.cscope")
     set nocst           " Don't search the cs db, but use ctags, on CTRL-]
     set csto=0          " If at all a :cstag is performed, use the cs db rather than the tag
     set csqf=c-,t-,e-   " Use quickfix window for caller and assignment search
-else
-    echo "Couldn't find the cs db!"
 endif
 
 command -complete=tag    -narg=1  T   tab  stj  <args>
 command -complete=tag    -nargs=1 VT  vert stj  <args>
 command -complete=buffer -nargs=1 VB  vert sb   <args>
+
+let s:gen = s:this_dir . "/vimrc.generated"
+if filereadable(s:gen)
+    exe "source " . s:gen
+endif
+
+exe "cd " . $PROJECT_ROOT
+
+call GetNPNavigatonChoiceFromUser("l")
