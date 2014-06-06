@@ -1,5 +1,5 @@
 [user]
-	name = Jeenu V
+	name = Jeenu Viswambharan
 	email = jeenuv@gmail.com
 [alias]
 	diffe = diff --ext-diff
@@ -28,3 +28,5 @@
 	lineNumber = true
 [rebase]
 	autosquash = true
+[rerere]
+	enabled = true
