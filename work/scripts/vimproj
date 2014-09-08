@@ -44,10 +44,11 @@ until [ -z "$*" ]; do
     shift
 done
 
-if [ -z "$1" -o ! -d "$HOME/vimproj/$1" ]; then
-    # All directory in the $HOME/vimproj directory
-    PROJECTS="$( (cd "$HOME/vimproj" && find -maxdepth 1 -type d -printf "%f " | sed 's/\.//') )"
-elif [ -d "$HOME/vimproj/$1" ]; then
+vimproj_dir="${VIMPROJ_DIR:-$HOME/vimproj}"
+if [ -z "$1" -o ! -d "$vimproj_dir/$1" ]; then
+    # All directory in the $vimproj_dir directory
+    PROJECTS="$( (cd "$vimproj_dir" && find -maxdepth 1 -type d -printf "%f " | sed 's/\.//') )"
+elif [ -d "$vimproj_dir/$1" ]; then
     PROJECT_NAME="$1"
     shift
 fi
@@ -64,7 +65,7 @@ if [ -z "$PROJECT_NAME" ]; then
     shift
 fi
 
-PROJECT_LOC="$HOME/vimproj/$PROJECT_NAME"
+PROJECT_LOC="$vimproj_dir/$PROJECT_NAME"
 
 # if there's vimrc file
 if [ -f "$PROJECT_LOC/vimrc" ]; then

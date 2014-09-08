@@ -96,21 +96,18 @@ function launch()
 # Function to re-make vimproj tags
 function makevimprojtags()
 {
+    local vimproj_dir="${VIMPROJ_DIR:-$HOME/vimproj}"
+
     if [ "$#" -ne 1 ]; then
         echo "makevimprojtags: usage: makevimprojtags project_name"
         return
     fi
 
-    if [ ! -d "$HOME/vimproj/$1" ]; then
-        echo "makevimprojtags: vimproject \"$1\" doesn't exist"
-        return
-    fi
-
-    if [ ! -f "$HOME/vimproj/$1/maketags" ]; then
-        echo  "makevimprojtags: $HOME/vimproj/$1/maketags doesn't exist"
+    if [ ! -f "$vimproj_dir/$1/maketags" ]; then
+        echo  "makevimprojtags: $vimproj_dir/$1/maketags doesn't exist"
         return
     else
-        $HOME/vimproj/$1/maketags $1
+        $vimproj_dir/$1/maketags $1
     fi
 }
 
@@ -210,18 +207,19 @@ function _vimproj_complete()
 {
     local COMMANDS CUR
     local projects
+    local vimproj_dir="${VIMPROJ_DIR:-$HOME/vimproj}"
 
     COMPREPLY=()
     CUR=${COMP_WORDS[$COMP_CWORD]}
 
     # We don't have anything to complete if directory itself isn't there!
-    if [ ! -d ~/vimproj ]; then
+    if [ ! -d "$vimproj_dir" ]; then
         return
     fi
 
     if [ "$COMP_CWORD" -eq 1 ]; then
         # Only directories and get rid of the '.' entry
-        projects=$(find ~/vimproj -type d -printf "%f\n" | sed '1d')
+        projects=$(find "$vimproj_dir" -maxdepth 1 -type d -printf "%f\n" | sed '2d')
         COMPREPLY=($(compgen -W "$projects" $CUR))
     fi
 }
