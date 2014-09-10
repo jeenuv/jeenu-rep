@@ -219,7 +219,7 @@ function _vimproj_complete()
 
     if [ "$COMP_CWORD" -eq 1 ]; then
         # Only directories and get rid of the '.' entry
-        projects=$(find "$vimproj_dir" -maxdepth 1 -type d -printf "%f\n" | sed '2d')
+        projects=$(find "$vimproj_dir" -maxdepth 1 -type d -printf "%f\n" | sed '1d')
         COMPREPLY=($(compgen -W "$projects" $CUR))
     fi
 }
