@@ -38,6 +38,9 @@ function cdn()
     local dir
     local max
 
+    # Change to a directory given as argument
+    [ "$1" ] && [ -d "$1" ] && cd "$1"
+
     while :; do
         echo "$PWD"
         listing=( $(find -maxdepth 1 -type d 2>/dev/null | sed '1{s/.*/../;n};s#^\./##' | sort) )
