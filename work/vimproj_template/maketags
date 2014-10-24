@@ -33,8 +33,12 @@ function buildfiles()
             find $(eval echo $tagdirs_flat) -maxdepth 1 \( -name .svn -o -name .git \) -prune -o \( -type f -a \( $findexpr \) \) -print >> "$taglist"
         [ "$tagdirs" ] &&
             find $(eval echo $tagdirs) \( -name .svn -o -name .git \) -prune -o \( -type f -a \( $findexpr \) \) -print >> "$taglist"
-        [ "$files" ] &&
-            echo $(eval echo $files) >> "$taglist"
+        # Iterate over files and append each of them in a separate line
+        if [ "$files" ]; then
+            for file in $(eval echo $files); do
+                echo $file >> "$taglist"
+            done
+        fi
     fi
 }
 
