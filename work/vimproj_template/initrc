@@ -1,4 +1,19 @@
+#!/bin/bash
 
 # REMEMBER - this file is **** SOURCED ****
 
 export PROJECT_ROOT=""
+
+# Define tag data
+NAME[0]="main"
+FILENAME[0]="${NAME[0]}.tag"
+LIST[0]="${NAME[0]}.list"
+FINDEXPR[0]="-iname *.c -o -iname *.h -o -iname *.S -o -name Makefile"
+DIRS[0]="
+"
+DIRS_FLAT[0]="
+"
+FILES[0]="
+"
+
+CTAGS_ARGS=""

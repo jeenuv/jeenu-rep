@@ -56,18 +56,6 @@ else
     script_echo "using \$PROJECT_ROOT as $PROJECT_ROOT"
 fi
 
-# Define tag data
-NAME[0]="main"
-FILENAME[0]="${NAME[0]}.tag"
-LIST[0]="${NAME[0]}.list"
-FINDEXPR[0]="-iname *.c -o -iname *.h -o -iname *.S -o -iname *.s -o -iname *.in[sc] -o -name Makefile"
-DIRS[0]="
-$PROJECT_ROOT
-"
-DIRS_FLAT[0]="
-"
-FILES[0]=""
-
 for index in "${!NAME[@]}"; do
     if confirm "build tag '${NAME[$index]}'"; then
         buildfiles "$index"
@@ -78,6 +66,7 @@ for index in "${!NAME[@]}"; do
         script_echo "building tag '${NAME[$index]}'"
         if ctags -L "${LIST[$index]}" \
             -o "${FILENAME[$index]}" \
+            $CTAGS_ARGS \
             --extra=+f; then
             script_echo "finished building tag '${NAME[$index]}'"
         else
@@ -116,7 +105,7 @@ fi
 
 ## Generate VIMRC
 
-# Generate vimrc. Escape spaces
+# Generate vimrc. Escape spaces. $PROJECT_LISTS would be provided by 'vimproj'
 cat <<EOF > vimrc.generated
 set grepprg=xargs\ grep\ -nH\ \$*\ <\ <(cat\ \$PROJECT_LISTS)
 EOF
