@@ -6,11 +6,6 @@ if ! which getopt >/dev/null; then
     exit 1
 fi
 
-# Use the DISPLAY variable only for gvimproj
-if ! echo "$PROGNAME" | grep -q 'gvimproj'; then
-    export DISPLAY=
-fi
-
 PROJECT_NAME=
 EXE_NAME="$(basename "$0")"
 EXE_NAME="${EXE_NAME%proj}"

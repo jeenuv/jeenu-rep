@@ -13,8 +13,7 @@ alias la='ls -a'
 alias ll='ls --color=tty -l'
 alias lr='ls --color=tty -1rt'
 alias ls='ls --color=tty'
-alias vimdiff='env -u DISPLAY vimdiff "+normal gg"'
-alias vi='env -u DISPLAY vim -n'
+alias vi='vim -n'
 alias grep='grep --color'
 alias dirs='dirs -v'
 alias bell='echo -ne "\a"'
@@ -23,7 +22,7 @@ alias mv='mv -iv'
 alias rm='rm -iv'
 alias L='less -iRSw'
 alias h='history | tac | L'         # Show history in reverse
-alias V='env -u DISPLAY vim -nR -'
+alias V='vim -nR -'
 
 # This is supposed to be used after a '|' from shell
 alias G='grep -nHI --exclude=\*.svn-base'
@@ -39,8 +38,7 @@ export PS3='> '
 # Even if this is done from bash_profile, it's safe to have it here
 echo $PATH | grep "$HOME/bin" >/dev/null || export PATH=$HOME/bin:$PATH
 
-export EDITOR='env -u DISPLAY vim'
-export SVN_EDITOR='env -u DISPLAY vim "+set tw=100"'
+export EDITOR='vim -n'
 
 # Make the shell ignore the .svn when completing file/directory names
 FIGNORE=".svn:.git:.o:~"
