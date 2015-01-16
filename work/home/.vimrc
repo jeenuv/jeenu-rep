@@ -187,6 +187,10 @@ nmap <C-W><C-T> :sp<CR><C-T>
 " Mapping to close the tag
 nmap <C-W>Q :tabc<CR>
 
+" When closing a window, close the associated location list as well
+nnoremap <C-W>c :call OnCloseWindow("close")<CR>
+nnoremap <C-W>q :call OnCloseWindow("quit")<CR>
+
 " Highlighting mappings. To undo these highligting, do :mat
 nmap \h yiw:call DoHighlight(1)<CR>|         " Normal mode highlighting
 vmap \h y:call DoHighlight()<CR>|            " Visual mode highlighting
@@ -389,6 +393,20 @@ function OnReturnKey()
     else
         " Else insert a blank line
         normal o
+    endif
+endfunction
+
+" What to do when closing a window
+function OnCloseWindow(cmd)
+    if &buftype == "nofile" || &buftype == "quickfix"
+        " It's either a command, quickfix, or a location window
+        " Just close
+        exec a:cmd
+    else
+        " Normal window. Close the corresponding location list window first
+        " And then close the actual window
+        lclose
+        exec a:cmd
     endif
 endfunction
 
