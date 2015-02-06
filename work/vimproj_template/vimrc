@@ -49,10 +49,32 @@ command -complete=tag    -narg=1  T   tab  stj  <args>
 command -complete=tag    -nargs=1 VT  vert stj  <args>
 command -complete=buffer -nargs=1 VB  vert sb   <args>
 
+" Read in generated vimrc, if any
 let s:gen = s:this_dir . "/vimrc.generated"
 if filereadable(s:gen)
     exe "source " . s:gen
 endif
+
+" We're in the project directory now.
+if isdirectory($PROJECT_ROOT . "/.git")
+    " Use to do git grep on the project
+    let s:grep = "git grep "
+
+    " Convenient aliases for Git commands
+    command Blame !git blame %
+    command GuiBlame !git gui blame %
+    command Log !git log -p %
+else
+    " Use to do normal grep on the project
+    let s:grep = "grep -rnHI "
+endif
+
+" Use to do grep on the project
+command -nargs=+ -complete=file G lex system(s:grep . <q-args>)<bar>lopen<bar>keepju lfirst
+" Same as G, but on a new tab
+command -nargs=+ -complete=file TG tabnew<bar>lex system(s:grep . <q-args>)<bar>lopen<bar>keepju lfirst
+" Same as G, but on a new vertical split
+command -nargs=+ -complete=file VG vsp<bar>lex system(s:grep . <q-args>)<bar>lopen<bar>keepju lfirst
 
 exe "cd " . $PROJECT_ROOT
 
