@@ -80,6 +80,9 @@ for tag in $(echo "$tagname" | sed 's/,/ /g'); do
     if [ -f "$PROJECT_LOC/$tag.tag" ]; then
         PROJECT_TAGS="${PROJECT_TAGS}${PROJECT_LOC}/${tag}.tag,"
         PROJECT_LISTS="${PROJECT_LISTS}${PROJECT_LOC}/${tag}.list"
+        if [ -f "$PROJECT_LOC/$tag.asmtag" ]; then
+            PROJECT_TAGS="${PROJECT_TAGS}${PROJECT_LOC}/${tag}.asmtag,"
+        fi
     else
         if ! confirm "$tag.tag doesn't exist in $PROJECT_NAME. Continue"; then
             exit 1
@@ -90,7 +93,7 @@ done
 # Add main.tag by default
 if ! echo "$PROJECT_TAGS" | grep -q "main.tag"; then
     if [ -f "$PROJECT_LOC/main.tag" ]; then
-        PROJECT_TAGS="$PROJECT_LOC/main.tag,${PROJECT_TAGS}"
+        PROJECT_TAGS="$PROJECT_LOC/main.tag,$PROJECT_LOC/main.asmtag,${PROJECT_TAGS}"
         PROJECT_LISTS="$PROJECT_LOC/main.list ${PROJECT_LISTS}"
     else
         if ! confirm "main.tag doesn't exist in $PROJECT_NAME. Continue"; then

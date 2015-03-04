@@ -72,6 +72,22 @@ for index in "${!NAME[@]}"; do
         else
             script_echo "error building tag '${NAME[$index]}'"
         fi
+
+        # Filter out assembly files and generate tags too. Use a temp file for now
+        asm_tag="${NAME[$index]}.asmtag.tmp"
+        : > "$asm_tag"
+        script_echo "Generating assembly tags ${NAME[$index]}.asmtag"
+        while read line; do
+            # Filter out .S files
+            echo "$line" | grep -q '\.S$' || continue;
+
+            # Generate tag from this file
+            awk -f gen_asm_tags.awk "$line" >> "$asm_tag"
+        done <"${LIST[$index]}"
+
+        # Sort and rename the temporary tag file
+        LC_COLLATE=C sort "$asm_tag" -o "${NAME[$index]}.asmtag"
+
     elif [ $CONFIRMED = "quit" ]; then
         exit
     fi
@@ -103,9 +119,3 @@ if confirm "build cscope"; then
     fi
 fi
 
-## Generate VIMRC
-
-# Generate vimrc. Escape spaces. $PROJECT_LISTS would be provided by 'vimproj'
-cat <<EOF > vimrc.generated
-set grepprg=xargs\ grep\ -nH\ \$*\ <\ <(cat\ \$PROJECT_LISTS)
-EOF
