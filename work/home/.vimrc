@@ -520,16 +520,21 @@ endfunction
 " the selection with corresponding closing tag
 function! GetTagWrapperChoiceFromUser() range
     let choice = input("Enter a tag to wrap: ")
-    let length = len(choice)
-    let pair = ""
-    let index = 0
-
+    let iexpr = &indentexpr
     let pair = "</" . choice . ">"
     let choice = "<" . choice . ">"
 
+    " Disable indentexpr while we insert the text
+    set indentexpr=
+
     " Now wrap the selection with the selected character and it's pair
-    execute "normal `>a" . pair . "\<ESC>`<i" . choice . "\<ESC>"
+    " Position the cursor so that any attributes can be keyed in with the key 'a'
+    execute "normal \<ESC>`>a" . pair . "\<ESC>`<i" . choice . "\<ESC>h"
+
+    " Restore indentexpr
+    let &indentexpr = iexpr
 endfunction
+
 " Function for preparing an SVN commit. Just do PrepareSVNCommit command and
 " you'll get the list of files eligible for commit
 function! PrepareSVNCommit()
