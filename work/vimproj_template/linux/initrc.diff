@@ -1,0 +1,39 @@
+--- initrc.linux	2015-03-04 08:51:59.423753000 +0000
++++ initrc	2015-03-04 16:57:27.294340000 +0000
+@@ -2,7 +2,7 @@
+ 
+ # REMEMBER - this file is **** SOURCED ****
+ 
+-export PROJECT_ROOT=""
++export PROJECT_ROOT="/work/stygian/linux"
+ 
+ # Define tag data
+ NAME[0]="main"
+@@ -10,10 +10,26 @@
+ LIST[0]="${NAME[0]}.list"
+ FINDEXPR[0]="-iname *.c -o -iname *.h -o -iname *.S -o -name Makefile"
+ DIRS[0]="
++$PROJECT_ROOT/{kernel,init,mm,ipc,lib}
++$PROJECT_ROOT/fs/{sys,debug}fs
++$PROJECT_ROOT/arch/arm/{boot,common,include,kernel,lib,mm,mach-vexpress,plat-versatile}
++$PROJECT_ROOT/include/{linux,asm-generic}
++$PROJECT_ROOT/drivers/{base,coresight}
++$PROJECT_ROOT/scripts/dtc/libfdt
+ "
+ DIRS_FLAT[0]="
++$PROJECT_ROOT/fs
++$PROJECT_ROOT/drivers/{amba,bus,of}
++$PROJECT_ROOT/include/uapi/{linux,asm-generic}
+ "
+ FILES[0]="
++$PROJECT_ROOT/drivers/tty/serial/{serial_core,amba-pl011}.c
++$PROJECT_ROOT/drivers/cpuidle/{cpuidle,driver,governor,coupled}.c
++$PROJECT_ROOT/drivers/cpuidle/arm_big_little.c
++$PROJECT_ROOT/drivers/irqchip/irqchip.{c,h}
++$PROJECT_ROOT/drivers/irqchip/irq-gic{.c,-common.{c,h}}
++$PROJECT_ROOT/drivers/mfd/vexpress-{config,sysreg,spc}.c
++$PROJECT_ROOT/include/generated/asm-offsets.h
+ "
+ 
+-CTAGS_ARGS=""
++CTAGS_ARGS="-I __initdata -I __init_task_data -I __read_mostly -I __initconst -I EXPORT_SYMBOL -I EXPORT_SYMBOL_GPL -I __cacheline_aligned_in_smp -I ___cacheline_aligned -I __be32 -I __initdata_memblock -I ____cacheline_internodealigned_in_smp __aligned+"
