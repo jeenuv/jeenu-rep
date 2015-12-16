@@ -11,6 +11,7 @@
 	diff = auto
 	status = true
 	ui = true
+	renames = true
 [color "diff"]
 	meta = white ul bold
 [core]
