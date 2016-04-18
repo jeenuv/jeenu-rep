@@ -1,6 +1,7 @@
 [user]
 	name = Jeenu Viswambharan
 	email = jeenuv@gmail.com
+	useConfigOnly = true
 [alias]
 	diffe = diff --ext-diff
 	diffi = diff --no-ext-diff
