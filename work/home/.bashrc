@@ -88,24 +88,6 @@ function launch()
     eval "$ARG_LIST &>/dev/null &"
 }
 
-# Function to re-make vimproj tags
-function makevimprojtags()
-{
-    local vimproj_dir="${VIMPROJ_DIR:-$HOME/vimproj}"
-
-    if [ "$#" -ne 1 ]; then
-        echo "makevimprojtags: usage: makevimprojtags project_name"
-        return
-    fi
-
-    if [ ! -f "$vimproj_dir/$1/maketags" ]; then
-        echo  "makevimprojtags: $vimproj_dir/$1/maketags doesn't exist"
-        return
-    else
-        $vimproj_dir/$1/maketags $1
-    fi
-}
-
 # Function to play all media files in a directory. More file types can be added later
 # Arguments are passed to mplayer directly
 function playall()
@@ -198,27 +180,6 @@ function D() {
 ############################
 ### Completion functions ###
 ############################
-function _vimproj_complete()
-{
-    local COMMANDS CUR
-    local projects
-    local vimproj_dir="${VIMPROJ_DIR:-$HOME/vimproj}"
-
-    COMPREPLY=()
-    CUR=${COMP_WORDS[$COMP_CWORD]}
-
-    # We don't have anything to complete if directory itself isn't there!
-    if [ ! -d "$vimproj_dir" ]; then
-        return
-    fi
-
-    if [ "$COMP_CWORD" -eq 1 ]; then
-        # Only directories and get rid of the '.' entry
-        projects=$(find "$vimproj_dir" -maxdepth 1 -type d -printf "%f\n" | sed '1d')
-        COMPREPLY=($(compgen -W "$projects" $CUR))
-    fi
-}
-
 function _launch_complete()
 {
     local COMMANDS CUR
@@ -234,10 +195,6 @@ function _launch_complete()
 ############################
 ###   Shell Completion   ###
 ############################
-complete -F _vimproj_complete -o default vimproj
-complete -F _vimproj_complete -o default gvimproj
-complete -F _vimproj_complete makevimprojtags
-
 complete -c which
 complete -c man
 complete -c launch
